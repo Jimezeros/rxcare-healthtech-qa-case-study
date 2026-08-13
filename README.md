@@ -25,6 +25,32 @@ The requirements and manual tests shown here have been designed and reviewed. Th
 
 `RXQA-10` is a clearly labelled candidate-defect exercise linked to test case `RXQA-7`. It is not presented as an observed production defect.
 
+## Jira evidence
+
+The screenshots below document the Jira Cloud implementation of the portfolio. They demonstrate the project workspace, issue hierarchy, Gherkin acceptance criteria, structured manual testing, and candidate-defect documentation. The Atlassian workspace remains private; only selected privacy-reviewed views are published here.
+
+### Project workspace and Board navigation
+
+![RxCare Jira project with Board navigation selected](https://github.com/user-attachments/assets/d0d073de-8526-4389-9d4f-67441810bc9c)
+
+### Story acceptance criteria
+
+![RXQA-5 Given When Then acceptance criteria in Jira](https://github.com/user-attachments/assets/31dfdb06-2213-48fe-aaf8-551b20f0746a)
+
+### Manual test case
+
+![RXQA-6 manual test steps and expected results in Jira](https://github.com/user-attachments/assets/6de7de8a-ca11-4b42-8201-11aa6a27cb66)
+
+### Candidate-defect status and traceability
+
+![RXQA-10 clearly labelled as portfolio practice and not executed](https://github.com/user-attachments/assets/25886c65-e93e-47ba-b2cd-aa9e141fe703)
+
+### Candidate expected and actual result design
+
+![RXQA-10 expected result and candidate actual result documentation](https://github.com/user-attachments/assets/d91bf468-ea6b-4886-b152-426d7cb3e22e)
+
+These images contain synthetic records only. Email addresses, private URLs, browser tabs, account controls, and unrelated personal information are excluded.
+
 ## Portfolio artifacts
 
 | Artifact | Purpose |
