@@ -1,0 +1,26 @@
+.DS_Store
+.idea/
+.vscode/
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.log
+*.tmp
+
+# Private working material
+private/
+personal/
+source-material/
+work/
+evidence/raw/
+
+# Job-search and identity documents
+CV_*
+Cover_Letter_*
+*Application*.pdf
+*.doc
+*.docx
+*.mov
+*.mp4
