@@ -1,0 +1,10 @@
+{
+  "body": {
+    "dosage_instruction": "   ",
+    "medication_name": "Synthetic Medicine",
+    "patient_ref": "SYN-PAT-002",
+    "record_id": "SYN-RUN-002"
+  },
+  "method": "POST",
+  "path": "/api/v1/prescriptions"
+}

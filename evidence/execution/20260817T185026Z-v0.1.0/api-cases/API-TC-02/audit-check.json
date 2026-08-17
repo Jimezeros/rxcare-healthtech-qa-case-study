@@ -1,0 +1,18 @@
+{
+  "body": {
+    "events": [
+      {
+        "action": "PRESCRIPTION_VALIDATION",
+        "app_version": "0.1.0",
+        "attempt_id": "31d57559-6e31-4bfe-9b64-87150fdc00f6",
+        "event_id": 2,
+        "outcome": "REJECTED",
+        "reason_code": "DOSAGE_REQUIRED",
+        "record_id": "SYN-RUN-002",
+        "timestamp_utc": "2026-08-17T18:50:26.427935Z"
+      }
+    ],
+    "record_id": "SYN-RUN-002"
+  },
+  "http_status": 200
+}
