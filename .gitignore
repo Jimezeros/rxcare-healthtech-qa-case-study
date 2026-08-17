@@ -24,3 +24,26 @@ Cover_Letter_*
 *.docx
 *.mov
 *.mp4
+
+# Local Python/runtime artifacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+.venv/
+runtime/
+
+# Local working screenshots that were not privacy-approved for publication.
+evidence/jira/board-current.jpg
+evidence/jira/board-fullview.jpg
+evidence/jira/rxqa-story-collapsed.jpg
+evidence/jira/rxqa-story-raw.jpg
+evidence/jira/tc-current.jpg
+evidence/jira/zoom-test.jpg
+
+# Preliminary local run superseded by the privacy-focused final v0.1.0 run.
+evidence/execution/20260817T175532Z-v0.1.0/
+evidence/execution/20260817T180242Z-v0.1.0/
+evidence/execution/20260817T180647Z-v0.1.0/
+evidence/execution/20260817T181107Z-v0.1.0/
+evidence/execution/20260817T181431Z-v0.1.0/

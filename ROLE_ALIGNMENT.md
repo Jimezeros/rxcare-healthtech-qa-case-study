@@ -4,16 +4,18 @@ This document maps the RxCare artifacts to the capabilities demonstrated by the 
 
 | Target direction | Portfolio evidence |
 |---|---|
-| Junior Manual QA / QA Analyst | Testable stories, Gherkin acceptance criteria, structured manual tests, regression selection, reproducible defect documentation, and traceability |
-| HealthTech Data Quality | Synthetic e-prescription validation, missing and inconsistent-data rules, controlled documentation, audit expectations, and safety-oriented risk analysis |
-| Product / Business Analysis | Product scope, personas, assumptions, user stories, measurable acceptance criteria, dependencies, and requirements-to-test coverage |
-| Secure Operations | Authentication, authorisation, privacy, audit-log, severity, evidence-preservation, and escalation considerations |
-| AI Content Quality | Rubric-based checks for instruction adherence, factual plausibility, unsafe health claims, clarity, terminology, and escalation |
+| Junior Manual QA / QA Analyst | Testable story, Gherkin acceptance criteria, structured UI test designs, executed API-contract cases, evidence-backed candidate-risk decision, and traceability |
+| Junior QA / Technical QA direction | Python validation, automated unit/integration tests, HTTP-handler contract tests, JUnit output, and reproducible evidence capture |
+| HealthTech Data Quality | Synthetic e-prescription rule, SQLite constraint, missing-data SQL checks, duplicate protection, privacy-safe audit events, and safety-oriented risk analysis |
+| Product / Business Analysis | Product boundary, measurable acceptance criteria, requirement-to-test mapping, and explicit implemented-versus-planned scope |
+| Data / Operations direction | Parameterised SQL, canonical-versus-audit data separation, UTC/version metadata, and deterministic quality-check outputs |
 
 ## Professional boundaries
 
 - This repository demonstrates structured portfolio practice, not prior employment as a professional QA engineer.
 - Jira capability is demonstrated through hands-on portfolio application.
-- Tests are not marked Passed or Failed without genuine execution.
-- Candidate defects remain clearly labelled until reproduced.
+- Only the API/service/database cases actually run against v0.1.0 are marked Passed.
+- UI-oriented Jira cases remain Not Executed.
+- RXQA-10 remains a candidate risk because it was not reproduced.
 - No confidential healthcare, employer, client, or production data is used.
+- Authentication/RBAC, AI evaluation, deployment, clinical validation, and regulatory compliance are not claimed.

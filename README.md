@@ -1,33 +1,72 @@
-# RxCare HealthTech QA Portfolio
+# RxCare HealthTech QA Case Study
 
-An independent HealthTech quality-assurance case study created and maintained by **Dimitrios Mezes**.
+An independent HealthTech QA and data-validation case study created and maintained by **Dimitrios Mezes**.
 
-## Project purpose
+RxCare now contains one working, reproducible vertical slice: a local Python service validates the dosage-completeness rule in `RXQA-5`, persists accepted synthetic records in SQLite, creates privacy-safe audit events for service-level prescription validation attempts, exposes a small HTTP contract, and produces structured execution evidence.
 
-RxCare is a fictional medication-management and e-prescription quality application. This portfolio demonstrates how healthcare-domain knowledge can be translated into testable requirements, structured manual tests, risk-based coverage, traceability, and professional defect documentation.
+## Product and scope
 
-The project uses synthetic data only. It contains no real patient, prescription, pharmacy, employer, client, or production information.
+RxCare is a fictional medication-management and e-prescription quality application. The project translates healthcare-domain risks into testable requirements, structured test design, executable validation, SQL controls, traceability, and evidence-backed reporting.
 
-## Skills demonstrated
+Only synthetic data is used. The repository contains no real patient, prescription, pharmacy, employer, client, or production information.
 
-- requirements analysis and user-story design;
-- Given/When/Then acceptance criteria;
-- positive, negative, boundary, and data-validation testing;
-- HealthTech data integrity and patient-safety risk analysis;
-- privacy, auditability, and access-control considerations;
-- structured bug reporting, severity, priority, and retesting logic;
-- Jira hierarchy and requirements-to-test traceability;
-- responsible evaluation of AI-generated health information.
+## Verified status — v0.1.0
 
-## Current portfolio status
+| Capability | Status | Evidence |
+|---|---|---|
+| Jira story, acceptance criteria, and four UI-oriented manual test designs | Designed — UI tests remain **Not Executed** | [Jira evidence](#jira-evidence), [manual cases](MANUAL_TEST_CASES_RXQA-5.md) |
+| Python dosage-completeness validation | Implemented and executed | [`src/rxcare/validation.py`](src/rxcare/validation.py), [test output](evidence/execution/20260817T185026Z-v0.1.0/automated_test_output.txt) |
+| SQLite canonical storage and privacy-safe audit log | Implemented and executed | [`sql/schema.sql`](sql/schema.sql), [sanitized audit evidence](evidence/execution/20260817T185026Z-v0.1.0/sanitized_audit_events.json) |
+| Parameterised SQL and quality checks | Implemented and executed | [`sql/quality_checks.sql`](sql/quality_checks.sql), [query results](evidence/execution/20260817T185026Z-v0.1.0/quality_checks.json) |
+| Local HTTP request/response contract | Implemented; handler contract executed in-process | [`src/rxcare/http_api.py`](src/rxcare/http_api.py), [API cases](API_TEST_CASES_RXQA-5.md) |
+| Automated unit, integration, database, and HTTP-handler tests | **16/16 Passed** | [JUnit XML](evidence/execution/20260817T185026Z-v0.1.0/junit.xml) |
+| Live TCP-port smoke test | **Not Executed** in the restricted sprint environment | [run metadata](evidence/execution/20260817T185026Z-v0.1.0/run_metadata.json), [local runbook](RUNBOOK_GR.md) |
+| RXQA-10 whitespace candidate risk | **Not reproduced on v0.1.0**; not a confirmed defect | [assessment](BUG_REPORT_RXQA-10.md) |
+| UI, authentication/RBAC, FastAPI migration, large synthetic dataset, broader medication rules, and deployment | Planned — not claimed as implemented | [methodology](PROJECT_METHODOLOGY.md) |
 
-The requirements and manual tests shown here have been designed and reviewed. They remain **Not Executed** until a genuine testable prototype is available and verifiable evidence can be captured.
+## First execution result
 
-`RXQA-10` is a clearly labelled candidate-defect exercise linked to test case `RXQA-7`. It is not presented as an observed production defect.
+The evidence run `20260817T185026Z-v0.1.0` passed:
+
+- empty dosage rejected with HTTP 422;
+- whitespace-only dosage rejected with HTTP 422;
+- rejected submissions absent from canonical storage;
+- valid dosage persisted without alteration;
+- exactly one privacy-safe audit event created per service-level prescription validation attempt;
+- duplicate record ID rejected with HTTP 409;
+- SQLite independently blocked a direct whitespace-only insert;
+- all four canonical-data SQL quality checks returned zero findings;
+- 16 automated tests passed.
+
+Start with the [execution report](TEST_EXECUTION_REPORT.md) and follow its links to the raw, synthetic evidence package.
+
+## Architecture
+
+```mermaid
+flowchart LR
+    A["Synthetic HTTP request"] --> B["Python HTTP adapter"]
+    B --> C["Pure validation rule"]
+    C -->|"Accepted"| D["SQLite prescriptions"]
+    C -->|"Accepted or rejected"| E["Privacy-safe audit event"]
+    D --> F["SQL quality checks"]
+    E --> F
+```
+
+The implementation uses Python's standard library only so the first slice can be reproduced without downloading packages. FastAPI is deliberately listed as a later milestone, not as a current capability. See [ARCHITECTURE.md](ARCHITECTURE.md) for the design decisions and boundaries.
+
+## Reproduce locally
+
+```bash
+PYTHONPATH=src python3 -m unittest discover -s tests -v
+PYTHONPATH=src python3 scripts/capture_execution_evidence.py
+PYTHONPATH=src python3 -m rxcare --database runtime/rxcare.db
+```
+
+The third command starts the optional local listener on `http://127.0.0.1:8000`. Greek step-by-step instructions and example requests are in [RUNBOOK_GR.md](RUNBOOK_GR.md).
 
 ## Jira evidence
 
-The screenshots below document the Jira Cloud implementation of the portfolio. They demonstrate the project workspace, issue hierarchy, Gherkin acceptance criteria, structured manual testing, and candidate-defect documentation. The Atlassian workspace remains private; only selected privacy-reviewed views are published here.
+The screenshots document the private Jira Cloud implementation. Only selected privacy-reviewed views are published.
 
 ### Project workspace and Board navigation
 
@@ -37,37 +76,35 @@ The screenshots below document the Jira Cloud implementation of the portfolio. T
 
 ![RXQA-5 Given When Then acceptance criteria in Jira](https://github.com/user-attachments/assets/31dfdb06-2213-48fe-aaf8-551b20f0746a)
 
-### Manual test case
+### Manual test design
 
 ![RXQA-6 manual test steps and expected results in Jira](https://github.com/user-attachments/assets/6de7de8a-ca11-4b42-8201-11aa6a27cb66)
 
-### Candidate-defect status and traceability
+### Candidate-risk status and traceability
 
 ![RXQA-10 clearly labelled as portfolio practice and not executed](https://github.com/user-attachments/assets/25886c65-e93e-47ba-b2cd-aa9e141fe703)
 
-### Candidate expected and actual result design
+The screenshot records remain evidence of the earlier design state. The later executable result is documented separately: RXQA-10 was not reproduced on v0.1.0.
 
-![RXQA-10 expected result and candidate actual result documentation](https://github.com/user-attachments/assets/d91bf468-ea6b-4886-b152-426d7cb3e22e)
-
-These images contain synthetic records only. Email addresses, private URLs, browser tabs, account controls, and unrelated personal information are excluded.
-
-## Portfolio artifacts
+## Repository guide
 
 | Artifact | Purpose |
 |---|---|
-| [PROJECT_METHODOLOGY.md](PROJECT_METHODOLOGY.md) | Scope, workflow, risk model, and quality controls |
-| [JIRA_STRUCTURE_GUIDE_GR.md](JIRA_STRUCTURE_GUIDE_GR.md) | Greek explanation of the Jira structure |
-| [ROLE_ALIGNMENT.md](ROLE_ALIGNMENT.md) | Skills demonstrated by the project |
-| [MANUAL_TEST_CASES_RXQA-5.md](MANUAL_TEST_CASES_RXQA-5.md) | Four traceable manual test cases |
-| [BUG_REPORT_RXQA-10.md](BUG_REPORT_RXQA-10.md) | First documented candidate defect |
-| [TRACEABILITY_MATRIX.md](TRACEABILITY_MATRIX.md) | Requirement-to-test-to-defect coverage |
-| [SYNTHETIC_DATA_POLICY.md](SYNTHETIC_DATA_POLICY.md) | Rules for privacy-safe fictional data |
-| [EVIDENCE_POLICY.md](EVIDENCE_POLICY.md) | Conditions for publishing execution evidence |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | Executable slice, data flow, privacy boundary, and design decisions |
+| [RUNBOOK_GR.md](RUNBOOK_GR.md) | Greek reproduction and local execution guide |
+| [API_TEST_CASES_RXQA-5.md](API_TEST_CASES_RXQA-5.md) | Executed API-contract cases and evidence links |
+| [TEST_EXECUTION_REPORT.md](TEST_EXECUTION_REPORT.md) | Latest verified execution summary |
+| [TRACEABILITY_MATRIX.md](TRACEABILITY_MATRIX.md) | Requirement-to-design-to-execution coverage |
+| [MANUAL_TEST_CASES_RXQA-5.md](MANUAL_TEST_CASES_RXQA-5.md) | Four UI-oriented test designs, still Not Executed |
+| [BUG_REPORT_RXQA-10.md](BUG_REPORT_RXQA-10.md) | Candidate-risk assessment and not-reproduced result |
+| [PROJECT_METHODOLOGY.md](PROJECT_METHODOLOGY.md) | Evidence rules, current scope, and planned coverage |
+| [SYNTHETIC_DATA_POLICY.md](SYNTHETIC_DATA_POLICY.md) | Privacy-safe fictional-data rules |
+| [EVIDENCE_POLICY.md](EVIDENCE_POLICY.md) | Publication and integrity controls |
 
 ## Ownership and integrity
 
-Every published artifact reflects work that the author understands, can explain, and can reproduce. Portfolio practice is not represented as prior professional QA employment, and designed tests are never presented as executed tests.
+Every published artifact is intended to be understood, explained, and reproduced by the author. Portfolio practice is not represented as prior professional QA employment. A designed test is not described as executed, an unobserved risk is not described as a defect, and a local prototype is not described as a clinical or production system.
 
 ## Disclaimer
 
-RxCare is a fictional educational product and is not associated with a real healthcare provider, pharmacy, employer, or commercial platform. Nothing in this repository constitutes medical advice.
+RxCare is a fictional educational product. It is not associated with a healthcare provider, pharmacy, employer, or commercial platform and does not provide medical advice.

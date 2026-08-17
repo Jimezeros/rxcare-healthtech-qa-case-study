@@ -11,4 +11,8 @@ Before committing a screenshot, video, export, or log:
 5. Do not present a designed test as executed evidence.
 6. Do not present a candidate or simulated defect as a confirmed application failure.
 
-No execution evidence is currently claimed.
+## Current published execution evidence
+
+Run `20260817T185026Z-v0.1.0` contains synthetic request/response records, assertions, sanitized audit rows, SQL finding counts, automated test output, JUnit XML, runtime metadata, and a SHA-256 manifest.
+
+The run states its limitations directly: the HTTP handler contract was executed in-process, the live TCP listener was not executed in the restricted environment, and the Jira UI-oriented test cases remain Not Executed.

@@ -1,14 +1,14 @@
 # Project Methodology
 
-## 1. Product concept
+## 1. Product concept and current increment
 
-RxCare is a fictional web application for medication-profile management and synthetic e-prescription quality validation. The case study focuses on data integrity, patient-safety awareness, privacy, auditability, and clear system behaviour.
+RxCare is a fictional medication-management and synthetic e-prescription quality application. Version `0.1.0` is not a complete web application: it is one local Python/SQLite validation slice for dosage completeness. The case study focuses on data integrity, patient-safety awareness, privacy, auditability, and evidence-backed system behaviour.
 
 ## 2. QA workflow
 
 The portfolio follows this evidence chain:
 
-`Risk -> Requirement -> Epic -> Story -> Acceptance Criteria -> Test Case -> Execution Evidence -> Defect -> Retest`
+`Risk -> Requirement -> Epic -> Story -> Acceptance Criteria -> Test Case -> Execution Evidence -> Defect decision -> Retest when needed`
 
 Each artifact must answer:
 
@@ -18,28 +18,30 @@ Each artifact must answer:
 4. What observable result is expected?
 5. What genuine evidence exists?
 
-## 3. Risk-based testing
+## 3. Risk-based backlog
 
-Test effort is prioritised according to potential impact:
+The broader backlog is prioritised according to potential impact:
 
 - incomplete or inconsistent medication information;
-- duplicate or conflicting records;
+- duplicate records;
 - unauthorised access or excessive data exposure;
 - missing audit events;
 - misleading AI-generated health explanations;
 - unclear validation and escalation messages.
 
+Only dosage completeness, duplicate-record protection, and minimum audit exposure are implemented in v0.1.0. The other items remain planned.
+
 ## 4. Test-design techniques
 
-The portfolio applies:
+The current executable slice applies:
 
 - equivalence partitioning for valid and invalid inputs;
-- boundary-value analysis where numerical or length limits exist;
 - negative testing for missing, malformed, or prohibited values;
 - positive controls to detect false rejection;
-- state and workflow checks;
 - requirements-based and risk-based coverage;
 - privacy and audit-log inspection.
+
+Boundary-value analysis, wider state/workflow testing, authentication/RBAC checks, and AI-content evaluation remain planned rather than demonstrated.
 
 ## 5. Definition of evidence
 
@@ -47,6 +49,10 @@ A designed test remains **Not Executed** until it is run against an approved tes
 
 A candidate defect becomes a confirmed defect only after genuine reproduction. The actual result must never be inferred or fabricated.
 
+The first evidence run follows that rule: whitespace-only dosage was rejected, so RXQA-10 is recorded as `Not reproduced on v0.1.0`, not converted into a confirmed defect.
+
 ## 6. Data protection
 
 All examples use synthetic identifiers and fictional medication records. Screenshots must be checked for email addresses, account identifiers, browser tabs, private URLs, avatars, and other unnecessary personal information before publication.
+
+Structured audit evidence must exclude synthetic patient references, medication names, dosage instructions, and free text unless a specific test requires those fields and publication remains safe.

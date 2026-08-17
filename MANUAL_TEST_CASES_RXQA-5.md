@@ -45,6 +45,12 @@ All records below are synthetic. Execution status: **NOT EXECUTED**.
 
 **Objective:** Verify that whitespace-only input is normalised as missing and rejected.
 
+**Preconditions**
+
+1. Tester is authenticated in the QA environment.
+2. Prescription import form is available.
+3. No real patient or pharmacy data is used.
+
 **Synthetic data**
 
 - Record ID: `SYN-RX-002`
@@ -70,11 +76,25 @@ All records below are synthetic. Execution status: **NOT EXECUTED**.
 
 **Objective:** Provide a positive control and verify that valid data is not falsely rejected.
 
+**Preconditions**
+
+1. Tester is authenticated in the QA environment.
+2. Prescription import form is available.
+3. No real patient or pharmacy data is used.
+
 **Synthetic data**
 
 - Record ID: `SYN-RX-003`
 - Medication: `Lisinopril 10 mg`
 - Dosage instruction: `Take one tablet once daily`
+
+**Steps**
+
+1. Open the prescription import form.
+2. Enter the synthetic record values.
+3. Enter the complete dosage instruction.
+4. Submit the record for validation.
+5. Reopen or query the accepted record.
 
 **Expected result**
 
@@ -89,12 +109,27 @@ All records below are synthetic. Execution status: **NOT EXECUTED**.
 
 **Objective:** Verify that rejection creates traceability without exposing unnecessary sensitive information.
 
+**Preconditions**
+
+1. Tester is authenticated in the QA environment.
+2. Prescription import form and authorized audit view are available.
+3. No real patient or pharmacy data is used.
+
 **Synthetic data**
 
 - Record ID: `SYN-RX-004`
 - Patient reference: `SYN-PAT-004`
 - Medication: `Ibuprofen 400 mg`
 - Dosage instruction: empty
+
+**Steps**
+
+1. Open the prescription import form.
+2. Enter the synthetic record values and leave dosage instruction empty.
+3. Submit the record.
+4. Record the submission timestamp and synthetic record ID.
+5. Open the authorized audit view.
+6. Search for the matching validation attempt.
 
 **Expected result**
 
