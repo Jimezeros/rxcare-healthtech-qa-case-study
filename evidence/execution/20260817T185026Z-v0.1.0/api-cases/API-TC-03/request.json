@@ -1,0 +1,10 @@
+{
+  "body": {
+    "dosage_instruction": "Take one unit once daily after food",
+    "medication_name": "Synthetic Medicine",
+    "patient_ref": "SYN-PAT-003",
+    "record_id": "SYN-RUN-003"
+  },
+  "method": "POST",
+  "path": "/api/v1/prescriptions"
+}

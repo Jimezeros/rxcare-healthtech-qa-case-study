@@ -1,0 +1,26 @@
+[
+  {
+    "actual": 201,
+    "assertion": "HTTP status",
+    "expected": 201,
+    "result": "PASS"
+  },
+  {
+    "actual": "ACCEPTED",
+    "assertion": "validation status",
+    "expected": "ACCEPTED",
+    "result": "PASS"
+  },
+  {
+    "actual": 200,
+    "assertion": "canonical record found",
+    "expected": 200,
+    "result": "PASS"
+  },
+  {
+    "actual": "Take one unit once daily after food",
+    "assertion": "dosage preserved exactly",
+    "expected": "Take one unit once daily after food",
+    "result": "PASS"
+  }
+]
