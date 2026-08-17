@@ -1,0 +1,42 @@
+[
+  {
+    "action": "PRESCRIPTION_VALIDATION",
+    "app_version": "0.1.0",
+    "attempt_id": "29b732fc-28c0-4e6a-a09b-4fd385d71031",
+    "event_id": 1,
+    "outcome": "REJECTED",
+    "reason_code": "DOSAGE_REQUIRED",
+    "record_id": "SYN-RUN-001",
+    "timestamp_utc": "2026-08-17T18:50:26.426012Z"
+  },
+  {
+    "action": "PRESCRIPTION_VALIDATION",
+    "app_version": "0.1.0",
+    "attempt_id": "31d57559-6e31-4bfe-9b64-87150fdc00f6",
+    "event_id": 2,
+    "outcome": "REJECTED",
+    "reason_code": "DOSAGE_REQUIRED",
+    "record_id": "SYN-RUN-002",
+    "timestamp_utc": "2026-08-17T18:50:26.427935Z"
+  },
+  {
+    "action": "PRESCRIPTION_VALIDATION",
+    "app_version": "0.1.0",
+    "attempt_id": "bb4377b6-3f8b-4eac-9a31-a3349660e901",
+    "event_id": 3,
+    "outcome": "ACCEPTED",
+    "reason_code": null,
+    "record_id": "SYN-RUN-003",
+    "timestamp_utc": "2026-08-17T18:50:26.429658Z"
+  },
+  {
+    "action": "PRESCRIPTION_VALIDATION",
+    "app_version": "0.1.0",
+    "attempt_id": "cde91916-7890-4843-b8d0-1e67a77df01c",
+    "event_id": 4,
+    "outcome": "REJECTED",
+    "reason_code": "DUPLICATE_RECORD_ID",
+    "record_id": "SYN-RUN-003",
+    "timestamp_utc": "2026-08-17T18:50:26.431472Z"
+  }
+]

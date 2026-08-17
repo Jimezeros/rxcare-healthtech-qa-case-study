@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuite name="rxcare" tests="16" failures="0" errors="0" skipped="0" time="0.033592">
+  <testcase classname="test_http_api.RxCareHttpApiTests" name="test_health_endpoint" time="0.003318" />
+  <testcase classname="test_http_api.RxCareHttpApiTests" name="test_valid_submission_can_be_retrieved" time="0.002616" />
+  <testcase classname="test_http_api.RxCareHttpApiTests" name="test_whitespace_dosage_returns_structured_422" time="0.002813" />
+  <testcase classname="test_service.PrescriptionServiceTests" name="test_audit_event_has_only_approved_privacy_safe_fields" time="0.002479" />
+  <testcase classname="test_service.PrescriptionServiceTests" name="test_duplicate_record_id_is_rejected_without_overwrite" time="0.002851" />
+  <testcase classname="test_service.PrescriptionServiceTests" name="test_empty_dosage_is_rejected_and_audited_once" time="0.002355" />
+  <testcase classname="test_service.PrescriptionServiceTests" name="test_null_dosage_is_rejected_and_audited_once" time="0.002374" />
+  <testcase classname="test_service.PrescriptionServiceTests" name="test_quality_checks_are_zero_for_valid_canonical_data" time="0.002633" />
+  <testcase classname="test_service.PrescriptionServiceTests" name="test_record_id_is_normalized_consistently_before_storage" time="0.002760" />
+  <testcase classname="test_service.PrescriptionServiceTests" name="test_sqlite_check_rejects_direct_whitespace_variants" time="0.002975" />
+  <testcase classname="test_service.PrescriptionServiceTests" name="test_valid_dosage_is_preserved_and_accepted_once" time="0.003071" />
+  <testcase classname="test_service.PrescriptionServiceTests" name="test_whitespace_dosage_is_rejected_and_audited_once" time="0.003088" />
+  <testcase classname="test_validation.BlankValueTests" name="test_none_empty_and_whitespace_are_blank" time="0.000045" />
+  <testcase classname="test_validation.BlankValueTests" name="test_visible_text_is_not_blank" time="0.000014" />
+  <testcase classname="test_validation.PrescriptionValidationTests" name="test_valid_record_has_no_issues" time="0.000020" />
+  <testcase classname="test_validation.PrescriptionValidationTests" name="test_whitespace_dosage_has_exact_rxqa_5_issue" time="0.000019" />
+</testsuite>

@@ -1,0 +1,78 @@
+{
+  "algorithm": "SHA-256",
+  "combined_source_tree_sha256": "2375f72c1955f396971cd639581d5a9abbae3f278169f285219a1402aea01f2d",
+  "files": [
+    {
+      "path": "VERSION",
+      "sha256": "e9dd8507f4bf0c6f42458e41aea833ad0bd3f6127272335eee9bf4d58541ed67"
+    },
+    {
+      "path": "pyproject.toml",
+      "sha256": "5fc93b43655bba69894e0ef7974863c15434096c517f9a2ce8f3bfff6ef5d1dc"
+    },
+    {
+      "path": "scripts/capture_execution_evidence.py",
+      "sha256": "e00af20507c2f0446fd9e6c45f3b178477a5a69a629d1da243b94905bc3a3c59"
+    },
+    {
+      "path": "scripts/run_tests.py",
+      "sha256": "5f5b8e3ec71c1aabed48b45ec65a8441c95a7164fa70a18ee911dd6d94376084"
+    },
+    {
+      "path": "sql/quality_checks.sql",
+      "sha256": "38d72662a8467bfa412974c47ea0c0471eeda878436613373a9b3f1cfa4dda54"
+    },
+    {
+      "path": "sql/schema.sql",
+      "sha256": "ac0415eac7e89a6a4f95d4c8c461934fb6fcf7c67c698fbca42c87a3eea3d25f"
+    },
+    {
+      "path": "src/rxcare/__init__.py",
+      "sha256": "07615486d7dfec21c7ce7af2efce996ab860baa7084795e2596befbf96d821e0"
+    },
+    {
+      "path": "src/rxcare/__main__.py",
+      "sha256": "41a047dde3749c7802d1ec82b1839a311b64efe20d6fe09de49ed0d0377d0c2d"
+    },
+    {
+      "path": "src/rxcare/database.py",
+      "sha256": "a3159245492627309259c7dd044588c1bf448cd4e31eb0040cd80763525eaf58"
+    },
+    {
+      "path": "src/rxcare/http_api.py",
+      "sha256": "1d881a9b772e3d85113a5e6b3334cf4f1c0d6fb891cd085151b3fd8e06a32cae"
+    },
+    {
+      "path": "src/rxcare/models.py",
+      "sha256": "03a3c0018150dca9bdc32066dcd6c8cbd9b221208c56921caaca68d3c3667aa0"
+    },
+    {
+      "path": "src/rxcare/service.py",
+      "sha256": "4b3090bc9e951113101ebaa4a321040b4c417e9f8a54b8327eebe61b11e4aeee"
+    },
+    {
+      "path": "src/rxcare/validation.py",
+      "sha256": "6bb4e6425e94785b703e41baa78f320b5158f5e4521d6bf5eb0197292d8a4227"
+    },
+    {
+      "path": "src/rxcare/version.py",
+      "sha256": "8a98045b825ba5e4100dd3a29acdf762ba730470c21dba3ab452304d975cc4c8"
+    },
+    {
+      "path": "tests/__init__.py",
+      "sha256": "a68e12f1320ac999fb180c00713f3ab544720e6b6466f8273c4f2a5b4a81f95c"
+    },
+    {
+      "path": "tests/test_http_api.py",
+      "sha256": "826c53aab56e1bd0942ac2d9f05d742cb2cfb262adb3c0a7ea0916cc1df037b3"
+    },
+    {
+      "path": "tests/test_service.py",
+      "sha256": "5ede03a50dcfd10c6a127ef81997109e056cd8d13c3ddab6d402afeac702d4c9"
+    },
+    {
+      "path": "tests/test_validation.py",
+      "sha256": "c3f54e5b48b00ff30cffef96a4b70223ba817660916f07444698af1cdcbd8c57"
+    }
+  ]
+}

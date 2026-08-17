@@ -1,0 +1,17 @@
+{
+  "app_version": "0.1.0",
+  "command": "PYTHONPATH=src python3 scripts/capture_execution_evidence.py",
+  "data_classification": "synthetic only",
+  "database": "fresh temporary SQLite database; deleted after export",
+  "git_sha": null,
+  "git_status_note": "Execution used the verified local staging copy; network-restricted Git synchronization was not performed in this run.",
+  "http_execution_mode": "in-process BaseHTTPRequestHandler contract",
+  "platform": "macOS-26.5.2-arm64-arm-64bit",
+  "python_implementation": "CPython",
+  "python_version": "3.9.6",
+  "run_id": "20260817T185026Z-v0.1.0",
+  "source_tree_sha256": "2375f72c1955f396971cd639581d5a9abbae3f278169f285219a1402aea01f2d",
+  "started_at_utc": "2026-08-17T18:50:26Z",
+  "tcp_listener_executed": false,
+  "test_runner": "Python unittest (pytest-compatible test structure)"
+}

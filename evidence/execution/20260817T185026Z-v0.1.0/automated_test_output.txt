@@ -1,0 +1,21 @@
+test_health_endpoint (test_http_api.RxCareHttpApiTests) ... ok
+test_valid_submission_can_be_retrieved (test_http_api.RxCareHttpApiTests) ... ok
+test_whitespace_dosage_returns_structured_422 (test_http_api.RxCareHttpApiTests) ... ok
+test_audit_event_has_only_approved_privacy_safe_fields (test_service.PrescriptionServiceTests) ... ok
+test_duplicate_record_id_is_rejected_without_overwrite (test_service.PrescriptionServiceTests) ... ok
+test_empty_dosage_is_rejected_and_audited_once (test_service.PrescriptionServiceTests) ... ok
+test_null_dosage_is_rejected_and_audited_once (test_service.PrescriptionServiceTests) ... ok
+test_quality_checks_are_zero_for_valid_canonical_data (test_service.PrescriptionServiceTests) ... ok
+test_record_id_is_normalized_consistently_before_storage (test_service.PrescriptionServiceTests) ... ok
+test_sqlite_check_rejects_direct_whitespace_variants (test_service.PrescriptionServiceTests) ... ok
+test_valid_dosage_is_preserved_and_accepted_once (test_service.PrescriptionServiceTests) ... ok
+test_whitespace_dosage_is_rejected_and_audited_once (test_service.PrescriptionServiceTests) ... ok
+test_none_empty_and_whitespace_are_blank (test_validation.BlankValueTests) ... ok
+test_visible_text_is_not_blank (test_validation.BlankValueTests) ... ok
+test_valid_record_has_no_issues (test_validation.PrescriptionValidationTests) ... ok
+test_whitespace_dosage_has_exact_rxqa_5_issue (test_validation.PrescriptionValidationTests) ... ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 0.034s
+
+OK

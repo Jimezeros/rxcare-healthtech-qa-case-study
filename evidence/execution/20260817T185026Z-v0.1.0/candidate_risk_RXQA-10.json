@@ -1,0 +1,7 @@
+{
+  "evidence_case": "API-TC-02",
+  "interpretation": "Whitespace-only dosage was rejected; no confirmed defect exists.",
+  "issue": "RXQA-10",
+  "status": "NOT_REPRODUCED",
+  "version": "0.1.0"
+}
