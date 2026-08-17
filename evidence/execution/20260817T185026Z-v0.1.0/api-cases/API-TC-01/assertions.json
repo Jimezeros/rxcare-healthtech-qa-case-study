@@ -1,0 +1,50 @@
+[
+  {
+    "actual": 422,
+    "assertion": "HTTP status",
+    "expected": 422,
+    "result": "PASS"
+  },
+  {
+    "actual": "REJECTED",
+    "assertion": "validation status",
+    "expected": "REJECTED",
+    "result": "PASS"
+  },
+  {
+    "actual": "DOSAGE_REQUIRED",
+    "assertion": "reason code",
+    "expected": "DOSAGE_REQUIRED",
+    "result": "PASS"
+  },
+  {
+    "actual": "Dosage is required",
+    "assertion": "error message",
+    "expected": "Dosage is required",
+    "result": "PASS"
+  },
+  {
+    "actual": 404,
+    "assertion": "canonical record absent",
+    "expected": 404,
+    "result": "PASS"
+  },
+  {
+    "actual": 200,
+    "assertion": "audit query status",
+    "expected": 200,
+    "result": "PASS"
+  },
+  {
+    "actual": 1,
+    "assertion": "exactly one audit event",
+    "expected": 1,
+    "result": "PASS"
+  },
+  {
+    "actual": "REJECTED",
+    "assertion": "audit outcome",
+    "expected": "REJECTED",
+    "result": "PASS"
+  }
+]
