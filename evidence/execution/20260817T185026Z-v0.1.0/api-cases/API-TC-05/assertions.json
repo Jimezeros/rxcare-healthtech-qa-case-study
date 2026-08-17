@@ -1,0 +1,44 @@
+[
+  {
+    "actual": 409,
+    "assertion": "HTTP status",
+    "expected": 409,
+    "result": "PASS"
+  },
+  {
+    "actual": "DUPLICATE_RECORD_ID",
+    "assertion": "duplicate reason code",
+    "expected": "DUPLICATE_RECORD_ID",
+    "result": "PASS"
+  },
+  {
+    "actual": 200,
+    "assertion": "original canonical record still found",
+    "expected": 200,
+    "result": "PASS"
+  },
+  {
+    "actual": "Take one unit once daily after food",
+    "assertion": "original dosage not overwritten",
+    "expected": "Take one unit once daily after food",
+    "result": "PASS"
+  },
+  {
+    "actual": 200,
+    "assertion": "duplicate audit query status",
+    "expected": 200,
+    "result": "PASS"
+  },
+  {
+    "actual": 2,
+    "assertion": "accepted and duplicate-rejected attempts both audited",
+    "expected": 2,
+    "result": "PASS"
+  },
+  {
+    "actual": "DUPLICATE_RECORD_ID",
+    "assertion": "duplicate audit reason code",
+    "expected": "DUPLICATE_RECORD_ID",
+    "result": "PASS"
+  }
+]
