@@ -1,0 +1,22 @@
+{
+  "app_version": "0.2.0",
+  "browser_javascript_executed": false,
+  "browser_screenshots_captured": false,
+  "command": "PYTHONPATH=src python3 scripts/capture_ui_execution_evidence.py",
+  "completed_at_utc": "2026-08-17T21:24:40Z",
+  "data_classification": "synthetic only; no case payload was submitted",
+  "database": "fresh temporary SQLite database; removed after blocked setup",
+  "git_sha": null,
+  "http_execution_mode": "NOT EXECUTED — loopback bind blocked",
+  "loopback_host": "127.0.0.1",
+  "overall_result": "BLOCKED",
+  "platform": "macOS-26.5.2-arm64-arm-64bit",
+  "python_implementation": "CPython",
+  "python_version": "3.9.6",
+  "run_id": "20260817T212440Z-ui-loopback-v0.2.0",
+  "source_tree_sha256": "ab42816b1c14a669586943ff390564d7feda43f964b7e210a89f6224ce5d82bc",
+  "started_at_utc": "2026-08-17T21:24:40Z",
+  "tcp_listener_executed": false,
+  "ui_route_requested": false,
+  "working_tree": "not available in this staging copy"
+}

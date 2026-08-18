@@ -1,0 +1,7 @@
+{
+  "errno": 1,
+  "error_type": "PermissionError",
+  "retry_guidance": "Run the same command on a workstation that permits binding an ephemeral 127.0.0.1 port.",
+  "safe_diagnostic": "The execution environment denied creation of the required loopback TCP listener. No network request was executed.",
+  "status": "BLOCKED"
+}
