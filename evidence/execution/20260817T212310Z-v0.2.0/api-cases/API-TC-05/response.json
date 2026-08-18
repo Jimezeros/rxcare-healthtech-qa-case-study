@@ -1,0 +1,18 @@
+{
+  "body": {
+    "app_version": "0.2.0",
+    "audit_event_id": 4,
+    "issues": [
+      {
+        "code": "DUPLICATE_RECORD_ID",
+        "field": "record_id",
+        "message": "Record ID already exists"
+      }
+    ],
+    "message": "Record ID already exists",
+    "reason_code": "DUPLICATE_RECORD_ID",
+    "record_id": "SYN-RUN-003",
+    "status": "REJECTED"
+  },
+  "http_status": 409
+}

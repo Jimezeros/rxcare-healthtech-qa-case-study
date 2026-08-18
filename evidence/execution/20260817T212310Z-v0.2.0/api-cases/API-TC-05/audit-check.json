@@ -1,0 +1,28 @@
+{
+  "body": {
+    "events": [
+      {
+        "action": "PRESCRIPTION_VALIDATION",
+        "app_version": "0.2.0",
+        "attempt_id": "d44ea3b8-8f95-47cf-b4b3-acef9795b27c",
+        "event_id": 3,
+        "outcome": "ACCEPTED",
+        "reason_code": null,
+        "record_id": "SYN-RUN-003",
+        "timestamp_utc": "2026-08-17T21:23:10.311257Z"
+      },
+      {
+        "action": "PRESCRIPTION_VALIDATION",
+        "app_version": "0.2.0",
+        "attempt_id": "f4886c4c-2874-41d7-8705-5fc1f2a43bf0",
+        "event_id": 4,
+        "outcome": "REJECTED",
+        "reason_code": "DUPLICATE_RECORD_ID",
+        "record_id": "SYN-RUN-003",
+        "timestamp_utc": "2026-08-17T21:23:10.312986Z"
+      }
+    ],
+    "record_id": "SYN-RUN-003"
+  },
+  "http_status": 200
+}

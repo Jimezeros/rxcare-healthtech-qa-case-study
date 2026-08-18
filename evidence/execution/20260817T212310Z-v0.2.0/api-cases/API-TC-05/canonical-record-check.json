@@ -1,0 +1,13 @@
+{
+  "body": {
+    "prescription": {
+      "app_version": "0.2.0",
+      "created_at_utc": "2026-08-17T21:23:10.311257Z",
+      "dosage_instruction": "Take one unit once daily after food",
+      "medication_name": "Synthetic Medicine",
+      "patient_ref": "SYN-PAT-003",
+      "record_id": "SYN-RUN-003"
+    }
+  },
+  "http_status": 200
+}
