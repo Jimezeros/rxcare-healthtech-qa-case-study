@@ -10,6 +10,9 @@ from pathlib import Path
 from typing import Dict, List
 
 
+REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
+
+
 class RecordingResult(unittest.TextTestResult):
     """Text result that also records machine-readable test outcomes."""
 
@@ -111,7 +114,16 @@ def main() -> int:
     parser.add_argument("--junit", type=Path, required=True)
     args = parser.parse_args()
 
-    suite = unittest.defaultTestLoader.discover("tests")
+    # ``python scripts/run_tests.py`` otherwise places only ``scripts/`` at the
+    # front of sys.path.  The repository root is required for tests that import
+    # the evidence modules as the ``scripts`` namespace package.
+    root_text = str(REPOSITORY_ROOT)
+    if root_text not in sys.path:
+        sys.path.insert(0, root_text)
+    suite = unittest.defaultTestLoader.discover(
+        str(REPOSITORY_ROOT / "tests"),
+        top_level_dir=root_text,
+    )
     runner = unittest.TextTestRunner(
         stream=sys.stdout,
         verbosity=2,

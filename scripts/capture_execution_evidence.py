@@ -426,11 +426,12 @@ risk, not a confirmed defect.
 
 ## Scope boundary
 
-The existing Jira UI-oriented manual cases RXQA-6 through RXQA-9 remain
-`Not Executed`. This run executed separate API-contract and automated cases
-linked to RXQA-5. It does not demonstrate a user interface, deployment,
-clinical validation, regulatory compliance, authentication, AI capability,
-or production readiness.
+The Jira UI-oriented cases RXQA-6 through RXQA-9 remain `Not Executed` in
+this run. Version v{APP_VERSION} includes a local browser UI, but the restricted
+execution environment blocked opening a loopback TCP listener. This run
+therefore demonstrates the handler/service/database contract, not live browser
+execution. It does not demonstrate deployment, clinical validation, regulatory
+compliance, authentication, AI capability, or production readiness.
 """
     (run_directory / "TEST_EXECUTION_REPORT.md").write_text(
         report, encoding="utf-8"
