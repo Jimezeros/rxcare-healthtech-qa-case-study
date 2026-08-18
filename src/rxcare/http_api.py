@@ -20,6 +20,9 @@ from .ui import render_index
 from .version import APP_VERSION
 
 
+MAX_JSON_BODY_BYTES = 64 * 1024
+
+
 def _json_bytes(payload: Dict[str, Any]) -> bytes:
     return json.dumps(payload, ensure_ascii=False, sort_keys=True).encode("utf-8")
 
@@ -59,16 +62,81 @@ def make_handler(service: PrescriptionService):
             self.end_headers()
             self.wfile.write(body)
 
-        def _read_json(self) -> Tuple[bool, Dict[str, Any]]:
+        def _read_json(
+            self,
+        ) -> Tuple[bool, Dict[str, Any], int, str, str]:
+            content_type = self.headers.get("Content-Type", "")
+            media_type = content_type.split(";", 1)[0].strip().lower()
+            if media_type != "application/json":
+                return (
+                    False,
+                    {},
+                    HTTPStatus.UNSUPPORTED_MEDIA_TYPE,
+                    "UNSUPPORTED_MEDIA_TYPE",
+                    "Content-Type must be application/json",
+                )
+
+            raw_content_length = self.headers.get("Content-Length")
+            if raw_content_length is None:
+                return (
+                    False,
+                    {},
+                    HTTPStatus.LENGTH_REQUIRED,
+                    "CONTENT_LENGTH_REQUIRED",
+                    "Content-Length is required",
+                )
+
             try:
-                content_length = int(self.headers.get("Content-Length", "0"))
+                content_length = int(raw_content_length)
+            except ValueError:
+                return (
+                    False,
+                    {},
+                    HTTPStatus.BAD_REQUEST,
+                    "INVALID_CONTENT_LENGTH",
+                    "Content-Length must be a non-negative integer",
+                )
+
+            if content_length < 0:
+                return (
+                    False,
+                    {},
+                    HTTPStatus.BAD_REQUEST,
+                    "INVALID_CONTENT_LENGTH",
+                    "Content-Length must be a non-negative integer",
+                )
+            if content_length > MAX_JSON_BODY_BYTES:
+                self.close_connection = True
+                return (
+                    False,
+                    {},
+                    HTTPStatus.REQUEST_ENTITY_TOO_LARGE,
+                    "PAYLOAD_TOO_LARGE",
+                    f"JSON body exceeds {MAX_JSON_BODY_BYTES} bytes",
+                )
+
+            try:
                 raw = self.rfile.read(content_length)
+                if len(raw) != content_length:
+                    return (
+                        False,
+                        {},
+                        HTTPStatus.BAD_REQUEST,
+                        "INCOMPLETE_BODY",
+                        "Request body is shorter than Content-Length",
+                    )
                 payload = json.loads(raw.decode("utf-8"))
                 if not isinstance(payload, dict):
                     raise ValueError("JSON body must be an object")
-                return True, payload
+                return True, payload, HTTPStatus.OK, "", ""
             except (UnicodeDecodeError, json.JSONDecodeError, ValueError):
-                return False, {}
+                return (
+                    False,
+                    {},
+                    HTTPStatus.BAD_REQUEST,
+                    "INVALID_JSON",
+                    "A JSON object is required",
+                )
 
         def do_GET(self) -> None:  # noqa: N802 - HTTP handler naming
             parsed = urlparse(self.path)
@@ -127,14 +195,20 @@ def make_handler(service: PrescriptionService):
                 self._send_json(HTTPStatus.NOT_FOUND, {"status": "NOT_FOUND"})
                 return
 
-            is_valid_json, payload = self._read_json()
+            (
+                is_valid_json,
+                payload,
+                error_status,
+                error_code,
+                error_message,
+            ) = self._read_json()
             if not is_valid_json:
                 self._send_json(
-                    HTTPStatus.BAD_REQUEST,
+                    error_status,
                     {
                         "status": "REJECTED",
-                        "reason_code": "INVALID_JSON",
-                        "message": "A JSON object is required",
+                        "reason_code": error_code,
+                        "message": error_message,
                     },
                 )
                 return
@@ -151,6 +225,14 @@ def create_server(
 ) -> ThreadingHTTPServer:
     database = RxCareDatabase(database_path)
     service = PrescriptionService(database)
+    return create_bound_server(service, host, port)
+
+
+def create_bound_server(
+    service: PrescriptionService, host: str = "127.0.0.1", port: int = 0
+) -> ThreadingHTTPServer:
+    """Bind the HTTP server after service/database initialization succeeds."""
+
     return ThreadingHTTPServer((host, port), make_handler(service))
 
 

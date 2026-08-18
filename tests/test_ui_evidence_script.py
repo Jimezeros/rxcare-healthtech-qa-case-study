@@ -40,8 +40,27 @@ class UiEvidenceScriptTests(unittest.TestCase):
                 ]
             )
             denied = PermissionError(1, "Operation not permitted")
+            source_context = {
+                "source_test_commit_sha": "a" * 40,
+                "source_test_commit_origin": "test",
+                "source_test_working_tree": "clean",
+                "source_test_changed_path_count": 0,
+                "source_test_context_captured_before_evidence": True,
+            }
+
+            def capture_before_output(
+                _repository_root, explicit_source_commit
+            ):
+                self.assertFalse((output_root / "blocked-test-run").exists())
+                self.assertIsNone(explicit_source_commit)
+                return source_context
+
             with mock.patch.object(
-                evidence, "create_server", side_effect=denied
+                evidence,
+                "capture_source_control_context",
+                side_effect=capture_before_output,
+            ), mock.patch.object(
+                evidence, "create_bound_server", side_effect=denied
             ):
                 with self.assertRaises(evidence.LoopbackBindError):
                     evidence.run_capture(args)
@@ -54,6 +73,8 @@ class UiEvidenceScriptTests(unittest.TestCase):
             )
             self.assertEqual(metadata["overall_result"], "BLOCKED")
             self.assertFalse(metadata["tcp_listener_executed"])
+            self.assertEqual(metadata["source_test_commit_sha"], "a" * 40)
+            self.assertEqual(metadata["source_test_working_tree"], "clean")
             report = (run_directory / "TEST_EXECUTION_REPORT.md").read_text(
                 encoding="utf-8"
             )
@@ -74,6 +95,30 @@ class UiEvidenceScriptTests(unittest.TestCase):
                 if path.is_file() and path.name != "sha256_manifest.txt"
             }
             self.assertEqual(listed, actual)
+
+    def test_pre_bind_oserror_is_not_misclassified_as_bind_denial(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_directory:
+            output_root = Path(temp_directory)
+            args = evidence.parse_args(
+                [
+                    "--output-root",
+                    str(output_root),
+                    "--run-id",
+                    "application-error-test-run",
+                ]
+            )
+            failure = OSError("database initialization failed")
+            with mock.patch.object(
+                evidence, "PrescriptionService", side_effect=failure
+            ):
+                with self.assertRaisesRegex(
+                    OSError, "database initialization failed"
+                ):
+                    evidence.run_capture(args)
+
+            self.assertFalse(
+                (output_root / "application-error-test-run").exists()
+            )
 
 
 if __name__ == "__main__":

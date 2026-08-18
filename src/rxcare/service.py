@@ -65,7 +65,10 @@ class PrescriptionService:
         safe_record_id = self._safe_record_id(record.record_id)
 
         with self.database.connection() as connection:
-            connection.execute("BEGIN")
+            # Acquire the write reservation before the duplicate lookup. This
+            # prevents concurrent deferred transactions from all reading a
+            # missing ID and then failing while upgrading to a write lock.
+            connection.execute("BEGIN IMMEDIATE")
 
             if not validation.is_valid:
                 primary_issue = validation.issues[0]

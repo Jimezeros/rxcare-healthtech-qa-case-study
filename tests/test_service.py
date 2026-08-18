@@ -2,7 +2,9 @@
 
 import sqlite3
 import tempfile
+import threading
 import unittest
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Optional
 
@@ -121,6 +123,63 @@ class PrescriptionServiceTests(unittest.TestCase):
         assert stored is not None
         self.assertEqual(stored["dosage_instruction"], "Take once daily")
         self.assertEqual(len(self.database.get_audit_events(record_id)), 2)
+
+    def test_40_concurrent_same_record_requests_are_controlled_and_audited(
+        self,
+    ) -> None:
+        worker_count = 40
+        record_id = "SYN-RXQA-CONCURRENT-001"
+        start_barrier = threading.Barrier(worker_count)
+
+        def submit_once(worker_number: int):
+            start_barrier.wait(timeout=10)
+            return self.service.submit(
+                PrescriptionInput(
+                    record_id=record_id,
+                    patient_ref=f"SYN-PAT-CONCURRENT-{worker_number:02d}",
+                    medication_name="Synthetic Medicine",
+                    dosage_instruction=(
+                        f"Take synthetic unit {worker_number:02d} once daily"
+                    ),
+                )
+            )
+
+        with ThreadPoolExecutor(max_workers=worker_count) as executor:
+            responses = list(executor.map(submit_once, range(worker_count)))
+
+        accepted = [
+            response for response in responses
+            if response["http_status"] == 201
+        ]
+        conflicts = [
+            response for response in responses
+            if response["http_status"] == 409
+        ]
+        self.assertEqual(len(accepted), 1)
+        self.assertEqual(len(conflicts), worker_count - 1)
+        self.assertEqual(
+            {response["reason_code"] for response in conflicts},
+            {"DUPLICATE_RECORD_ID"},
+        )
+
+        stored = self.database.get_prescription(record_id)
+        self.assertIsNotNone(stored)
+        events = self.database.get_audit_events(record_id)
+        self.assertEqual(len(events), worker_count)
+        self.assertEqual(
+            sum(event["outcome"] == "ACCEPTED" for event in events), 1
+        )
+        self.assertEqual(
+            sum(event["outcome"] == "REJECTED" for event in events),
+            worker_count - 1,
+        )
+        self.assertEqual(
+            {event["reason_code"] for event in events if event["outcome"] == "REJECTED"},
+            {"DUPLICATE_RECORD_ID"},
+        )
+        self.assertEqual(
+            len({event["attempt_id"] for event in events}), worker_count
+        )
 
     def test_record_id_is_normalized_consistently_before_storage(self) -> None:
         submitted = PrescriptionInput(

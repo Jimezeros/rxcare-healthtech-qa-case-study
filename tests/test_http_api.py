@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
 
 from rxcare.database import RxCareDatabase
-from rxcare.http_api import make_handler
+from rxcare.http_api import MAX_JSON_BODY_BYTES, make_handler
 from rxcare.service import PrescriptionService
 from rxcare.version import APP_VERSION
 
@@ -37,18 +37,30 @@ class RxCareHttpApiTests(unittest.TestCase):
         payload: Optional[Dict[str, Any]] = None,
     ) -> Tuple[int, Dict[str, str], bytes]:
         body = b""
-        headers = ["Host: rxcare.local", "Connection: close"]
+        headers: Dict[str, str] = {}
         if payload is not None:
             body = json.dumps(payload).encode("utf-8")
-            headers.extend(
-                [
-                    "Content-Type: application/json",
-                    f"Content-Length: {len(body)}",
-                ]
-            )
+            headers = {
+                "Content-Type": "application/json",
+                "Content-Length": str(len(body)),
+            }
+        return self.raw_request(method, path, body=body, headers=headers)
+
+    def raw_request(
+        self,
+        method: str,
+        path: str,
+        *,
+        body: bytes = b"",
+        headers: Optional[Dict[str, str]] = None,
+    ) -> Tuple[int, Dict[str, str], bytes]:
+        request_headers = ["Host: rxcare.local", "Connection: close"]
+        request_headers.extend(
+            f"{name}: {value}" for name, value in (headers or {}).items()
+        )
         raw_request = (
             f"{method} {path} HTTP/1.1\r\n"
-            + "\r\n".join(headers)
+            + "\r\n".join(request_headers)
             + "\r\n\r\n"
         ).encode("ascii") + body
 
@@ -215,6 +227,99 @@ class RxCareHttpApiTests(unittest.TestCase):
         self.assertNotIn("patient_ref", event)
         self.assertNotIn("medication_name", event)
         self.assertNotIn("dosage_instruction", event)
+
+    def test_post_rejects_unsupported_content_type_without_audit(self) -> None:
+        body = b'{}'
+        status, _, response_body = self.raw_request(
+            "POST",
+            "/api/v1/prescriptions",
+            body=body,
+            headers={
+                "Content-Type": "text/plain",
+                "Content-Length": str(len(body)),
+            },
+        )
+        payload = json.loads(response_body.decode("utf-8"))
+
+        self.assertEqual(status, 415)
+        self.assertEqual(payload["reason_code"], "UNSUPPORTED_MEDIA_TYPE")
+        self.assertEqual(self.service.database.audit_summary(), [])
+
+    def test_post_requires_valid_content_length_without_audit(self) -> None:
+        cases = (
+            ("missing", {}, "CONTENT_LENGTH_REQUIRED", 411),
+            (
+                "non-integer",
+                {"Content-Length": "not-a-number"},
+                "INVALID_CONTENT_LENGTH",
+                400,
+            ),
+            (
+                "negative",
+                {"Content-Length": "-1"},
+                "INVALID_CONTENT_LENGTH",
+                400,
+            ),
+            (
+                "short-body",
+                {"Content-Length": "3"},
+                "INCOMPLETE_BODY",
+                400,
+            ),
+        )
+        for label, extra_headers, reason_code, expected_status in cases:
+            with self.subTest(label=label):
+                headers = {"Content-Type": "application/json"}
+                headers.update(extra_headers)
+                body = b"{}" if label != "missing" else b""
+                status, _, response_body = self.raw_request(
+                    "POST",
+                    "/api/v1/prescriptions",
+                    body=body,
+                    headers=headers,
+                )
+                payload = json.loads(response_body.decode("utf-8"))
+                self.assertEqual(status, expected_status)
+                self.assertEqual(payload["reason_code"], reason_code)
+
+        self.assertEqual(self.service.database.audit_summary(), [])
+
+    def test_post_rejects_oversized_declared_body_without_reading(self) -> None:
+        status, _, response_body = self.raw_request(
+            "POST",
+            "/api/v1/prescriptions",
+            headers={
+                "Content-Type": "application/json",
+                "Content-Length": str(MAX_JSON_BODY_BYTES + 1),
+            },
+        )
+        payload = json.loads(response_body.decode("utf-8"))
+
+        self.assertEqual(status, 413)
+        self.assertEqual(payload["reason_code"], "PAYLOAD_TOO_LARGE")
+        self.assertEqual(self.service.database.audit_summary(), [])
+
+    def test_json_content_type_parameters_are_accepted(self) -> None:
+        request_payload = {
+            "record_id": "SYN-HTTP-CONTENT-TYPE-001",
+            "patient_ref": "SYN-PAT-CONTENT-TYPE-001",
+            "medication_name": "Synthetic Medicine",
+            "dosage_instruction": "Take one synthetic unit daily",
+        }
+        body = json.dumps(request_payload).encode("utf-8")
+        status, _, response_body = self.raw_request(
+            "POST",
+            "/api/v1/prescriptions",
+            body=body,
+            headers={
+                "Content-Type": "application/json; charset=utf-8",
+                "Content-Length": str(len(body)),
+            },
+        )
+        payload = json.loads(response_body.decode("utf-8"))
+
+        self.assertEqual(status, 201)
+        self.assertEqual(payload["status"], "ACCEPTED")
 
 
 if __name__ == "__main__":

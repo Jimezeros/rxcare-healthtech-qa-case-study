@@ -2,13 +2,23 @@
 
 import sqlite3
 from contextlib import contextmanager
+from importlib import resources
 from pathlib import Path
 from typing import Dict, Iterator, List, Optional
 
 
-REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
-SCHEMA_PATH = REPOSITORY_ROOT / "sql" / "schema.sql"
-QUALITY_CHECKS_PATH = REPOSITORY_ROOT / "sql" / "quality_checks.sql"
+SQLITE_TIMEOUT_SECONDS = 30.0
+SQLITE_BUSY_TIMEOUT_MS = 30_000
+
+
+def sql_resource_text(filename: str) -> str:
+    """Read packaged SQL without depending on a repository checkout layout."""
+
+    return (
+        resources.files("rxcare")
+        .joinpath("sql", filename)
+        .read_text(encoding="utf-8")
+    )
 
 
 class RxCareDatabase:
@@ -20,9 +30,12 @@ class RxCareDatabase:
     @contextmanager
     def connection(self) -> Iterator[sqlite3.Connection]:
         self.database_path.parent.mkdir(parents=True, exist_ok=True)
-        connection = sqlite3.connect(str(self.database_path))
+        connection = sqlite3.connect(
+            str(self.database_path), timeout=SQLITE_TIMEOUT_SECONDS
+        )
         connection.row_factory = sqlite3.Row
         connection.execute("PRAGMA foreign_keys = ON")
+        connection.execute(f"PRAGMA busy_timeout = {SQLITE_BUSY_TIMEOUT_MS}")
         try:
             yield connection
         finally:
@@ -32,10 +45,8 @@ class RxCareDatabase:
         """Create the schema and read-only quality-check views."""
 
         with self.connection() as connection:
-            connection.executescript(SCHEMA_PATH.read_text(encoding="utf-8"))
-            connection.executescript(
-                QUALITY_CHECKS_PATH.read_text(encoding="utf-8")
-            )
+            connection.executescript(sql_resource_text("schema.sql"))
+            connection.executescript(sql_resource_text("quality_checks.sql"))
             connection.commit()
 
     @staticmethod

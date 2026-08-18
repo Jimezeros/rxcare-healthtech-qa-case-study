@@ -4,8 +4,9 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "rxcare-validation-prototype"
-version = "0.2.0"
+version = "0.2.1"
 description = "A local, synthetic-data validation prototype for the RxCare QA case study."
+authors = [{name = "Dimitrios Mezes"}]
 requires-python = ">=3.9"
 dependencies = []
 
@@ -14,3 +15,6 @@ package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+rxcare = ["sql/*.sql"]

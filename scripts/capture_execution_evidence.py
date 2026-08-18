@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Execute the RXQA-5 slice and capture reproducible, synthetic evidence."""
 
+import argparse
 import hashlib
 import io
 import json
@@ -9,12 +10,16 @@ import platform
 import subprocess
 import sys
 import tempfile
+import threading
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 from rxcare.database import RxCareDatabase
 from rxcare.http_api import make_handler
+from rxcare.models import PrescriptionInput
+from rxcare.provenance import capture_source_control_context
 from rxcare.service import PrescriptionService
 from rxcare.version import APP_VERSION
 
@@ -39,7 +44,13 @@ def source_manifest() -> Tuple[str, List[Dict[str, str]]]:
         REPOSITORY_ROOT / "VERSION",
         REPOSITORY_ROOT / "pyproject.toml",
     ]
-    for pattern in ("src/**/*.py", "sql/*.sql", "tests/*.py", "scripts/*.py"):
+    for pattern in (
+        "src/**/*.py",
+        "src/**/*.sql",
+        "sql/*.sql",
+        "tests/*.py",
+        "scripts/*.py",
+    ):
         candidates.extend(REPOSITORY_ROOT.glob(pattern))
 
     entries = []
@@ -377,6 +388,97 @@ def execute_api_cases(
     return summaries
 
 
+def execute_concurrency_evidence(
+    service: PrescriptionService,
+    database: RxCareDatabase,
+    run_directory: Path,
+) -> Dict[str, Any]:
+    """Exercise simultaneous same-ID writes and persist privacy-safe evidence."""
+
+    worker_count = 40
+    record_id = "SYN-RUN-CONCURRENT-001"
+    start_barrier = threading.Barrier(worker_count)
+
+    def submit_once(worker_number: int) -> Dict[str, Any]:
+        start_barrier.wait(timeout=10)
+        return service.submit(
+            PrescriptionInput(
+                record_id=record_id,
+                patient_ref=f"SYN-PAT-CONCURRENT-{worker_number:02d}",
+                medication_name="Synthetic Medicine",
+                dosage_instruction=(
+                    f"Take synthetic unit {worker_number:02d} once daily"
+                ),
+            )
+        )
+
+    with ThreadPoolExecutor(max_workers=worker_count) as executor:
+        responses = list(executor.map(submit_once, range(worker_count)))
+
+    events = database.get_audit_events(record_id)
+    status_counts = {
+        str(status): sum(
+            response["http_status"] == status for response in responses
+        )
+        for status in (201, 409)
+    }
+    outcome_counts = {
+        outcome: sum(event["outcome"] == outcome for event in events)
+        for outcome in ("ACCEPTED", "REJECTED")
+    }
+    assertions = [
+        assert_equal(status_counts["201"], 1, "one request accepted"),
+        assert_equal(
+            status_counts["409"],
+            worker_count - 1,
+            "remaining requests rejected as duplicates",
+        ),
+        assert_equal(len(events), worker_count, "one audit event per attempt"),
+        assert_equal(outcome_counts["ACCEPTED"], 1, "one accepted audit event"),
+        assert_equal(
+            outcome_counts["REJECTED"],
+            worker_count - 1,
+            "remaining audit events rejected",
+        ),
+        assert_equal(
+            len({event["attempt_id"] for event in events}),
+            worker_count,
+            "unique attempt ID per request",
+        ),
+        assert_equal(
+            sorted(
+                {
+                    event["reason_code"]
+                    for event in events
+                    if event["outcome"] == "REJECTED"
+                }
+            ),
+            ["DUPLICATE_RECORD_ID"],
+            "duplicate reason is stable",
+        ),
+    ]
+    artifact = {
+        "case_id": "CONCURRENCY-TC-01",
+        "execution_mode": (
+            "40 simultaneous in-process PrescriptionService.submit calls "
+            "against one fresh temporary SQLite database"
+        ),
+        "data_classification": "synthetic only",
+        "record_id": record_id,
+        "worker_count": worker_count,
+        "http_status_counts": status_counts,
+        "audit_outcome_counts": outcome_counts,
+        "canonical_record_count": (
+            1 if database.get_prescription(record_id) is not None else 0
+        ),
+        "assertions": assertions,
+        "sanitized_audit_events": events,
+        "result": "PASS",
+    }
+    write_json(run_directory / "concurrency_evidence.json", artifact)
+    return artifact
+
+
 def create_markdown_report(
     run_directory: Path,
     metadata: Dict[str, Any],
@@ -410,6 +512,15 @@ The cases above exercised the real Python HTTP handler with complete HTTP/1.1
 request and response framing inside the process. The sandbox blocked opening a
 local TCP listener, so a live-port smoke test was **not executed in this run**.
 The runbook contains the command for that separate workstation check.
+
+## Concurrency verification
+
+`CONCURRENCY-TC-01` executed 40 simultaneous service submissions using the
+same synthetic record ID. Exactly one request was accepted, 39 were rejected
+with `DUPLICATE_RECORD_ID`, one canonical record remained, and all 40 attempts
+received distinct privacy-safe audit events. The detailed assertions and
+sanitized events are in `concurrency_evidence.json`. This is an in-process
+service/database concurrency check, not a live-network load test.
 
 ## Automated verification
 
@@ -450,15 +561,48 @@ def create_manifest(run_directory: Path) -> None:
     )
 
 
-def main() -> int:
+def prepare_run_directory(
+    run_directory: Path,
+    explicit_source_commit: Optional[str] = None,
+) -> Dict[str, Any]:
+    """Capture source provenance before creating the evidence directory."""
+
+    if run_directory.exists():
+        raise RuntimeError(f"Run directory already exists: {run_directory}")
+    source_control_context = capture_source_control_context(
+        REPOSITORY_ROOT, explicit_source_commit
+    )
+    run_directory.mkdir(parents=True)
+    return source_control_context
+
+
+def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Capture synthetic RxCare API execution evidence."
+    )
+    parser.add_argument(
+        "--source-commit",
+        help=(
+            "source/test Git commit for a detached staging copy; must match "
+            "HEAD when Git metadata is available"
+        ),
+    )
+    return parser.parse_args(argv)
+
+
+def main(argv: Optional[List[str]] = None) -> int:
+    args = parse_args(argv)
     started_at = utc_timestamp()
     run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + (
         f"-v{APP_VERSION}"
     )
     run_directory = REPOSITORY_ROOT / "evidence" / "execution" / run_id
-    if run_directory.exists():
-        raise RuntimeError(f"Run directory already exists: {run_directory}")
-    run_directory.mkdir(parents=True)
+    # Capture Git/source state before the evidence folder can make a clean
+    # working tree appear dirty. Detached staging copies can use the explicit
+    # RXCARE_SOURCE_COMMIT environment override.
+    source_control_context = prepare_run_directory(
+        run_directory, args.source_commit
+    )
 
     source_tree_digest, source_entries = source_manifest()
 
@@ -469,18 +613,17 @@ def main() -> int:
         "python_version": platform.python_version(),
         "python_implementation": platform.python_implementation(),
         "platform": platform.platform(),
-        "git_sha": None,
-        "git_status_note": (
-            "Execution used the verified local staging copy; network-restricted "
-            "Git synchronization was not performed in this run."
-        ),
         "source_tree_sha256": source_tree_digest,
         "database": "fresh temporary SQLite database; deleted after export",
         "data_classification": "synthetic only",
         "http_execution_mode": "in-process BaseHTTPRequestHandler contract",
         "tcp_listener_executed": False,
+        "concurrency_execution_mode": (
+            "40 simultaneous in-process service calls against fresh SQLite"
+        ),
         "test_runner": "Python unittest (pytest-compatible test structure)",
         "command": "PYTHONPATH=src python3 scripts/capture_execution_evidence.py",
+        **source_control_context,
     }
     write_json(run_directory / "run_metadata.json", metadata)
     write_json(
@@ -496,6 +639,7 @@ def main() -> int:
         database = RxCareDatabase(Path(temp_dir) / "rxcare-run.db")
         service = PrescriptionService(database)
         case_summaries = execute_api_cases(service, run_directory)
+        execute_concurrency_evidence(service, database, run_directory)
         write_json(
             run_directory / "quality_checks.json",
             {

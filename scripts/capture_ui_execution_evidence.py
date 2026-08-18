@@ -29,7 +29,9 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple
 from urllib.parse import quote
 
 from rxcare.database import RxCareDatabase
-from rxcare.http_api import create_server
+from rxcare.http_api import create_bound_server
+from rxcare.provenance import capture_source_control_context
+from rxcare.service import PrescriptionService
 from rxcare.version import APP_VERSION
 
 
@@ -80,7 +82,13 @@ def source_manifest() -> Tuple[str, List[Dict[str, str]]]:
         REPOSITORY_ROOT / "VERSION",
         REPOSITORY_ROOT / "pyproject.toml",
     ]
-    for pattern in ("src/**/*.py", "sql/*.sql", "tests/*.py", "scripts/*.py"):
+    for pattern in (
+        "src/**/*.py",
+        "src/**/*.sql",
+        "sql/*.sql",
+        "tests/*.py",
+        "scripts/*.py",
+    ):
         candidates.extend(REPOSITORY_ROOT.glob(pattern))
 
     entries: List[Dict[str, str]] = []
@@ -95,49 +103,6 @@ def source_manifest() -> Tuple[str, List[Dict[str, str]]]:
         entries, ensure_ascii=False, sort_keys=True, separators=(",", ":")
     ).encode("utf-8")
     return sha256_bytes(canonical), entries
-
-
-def git_context() -> Dict[str, Any]:
-    """Return local Git context without treating its absence as an error."""
-
-    try:
-        top_level = subprocess.run(
-            ["git", "rev-parse", "--show-toplevel"],
-            cwd=REPOSITORY_ROOT,
-            text=True,
-            capture_output=True,
-            check=False,
-        )
-        if top_level.returncode != 0:
-            return {
-                "git_sha": None,
-                "working_tree": "not available in this staging copy",
-            }
-        revision = subprocess.run(
-            ["git", "rev-parse", "HEAD"],
-            cwd=REPOSITORY_ROOT,
-            text=True,
-            capture_output=True,
-            check=True,
-        ).stdout.strip()
-        status = subprocess.run(
-            ["git", "status", "--porcelain"],
-            cwd=REPOSITORY_ROOT,
-            text=True,
-            capture_output=True,
-            check=True,
-        ).stdout.splitlines()
-        return {
-            "git_sha": revision,
-            "working_tree": "dirty" if status else "clean",
-            "changed_path_count": len(status),
-        }
-    except (OSError, subprocess.SubprocessError) as error:
-        return {
-            "git_sha": None,
-            "working_tree": "unavailable",
-            "diagnostic": type(error).__name__,
-        }
 
 
 def selected_headers(headers: Iterable[Tuple[str, str]]) -> Dict[str, str]:
@@ -752,6 +717,7 @@ def create_blocked_run(
     started_at: str,
     bind_error: OSError,
     loopback_host: str,
+    source_control_context: Dict[str, Any],
 ) -> None:
     """Record a truthful non-PASS bundle when loopback binding is denied."""
 
@@ -778,7 +744,7 @@ def create_blocked_run(
         "command": (
             "PYTHONPATH=src python3 scripts/capture_ui_execution_evidence.py"
         ),
-        **git_context(),
+        **source_control_context,
     }
     write_json(run_directory / "run_metadata.json", metadata)
     write_json(
@@ -964,11 +930,21 @@ def run_capture(args: argparse.Namespace) -> Tuple[Path, bool]:
     run_directory = output_root / run_id
     if run_directory.exists():
         raise FileExistsError(f"Run directory already exists: {run_directory}")
+    # This must happen before either the PASS/FAIL run or a BLOCKED bundle is
+    # created, otherwise evidence output itself would alter Git dirty state.
+    source_control_context = capture_source_control_context(
+        REPOSITORY_ROOT, args.source_commit
+    )
 
     with tempfile.TemporaryDirectory(prefix="rxcare-ui-evidence-") as temp_dir:
         database_path = Path(temp_dir) / "rxcare-ui-run.db"
+        # Complete application/database initialization before the narrow bind
+        # error boundary. An OSError here is an application failure and must
+        # never be labelled as an environment-blocked loopback listener.
+        database = RxCareDatabase(database_path)
+        service = PrescriptionService(database)
         try:
-            server = create_server(database_path, args.host, args.port)
+            server = create_bound_server(service, args.host, args.port)
         except OSError as error:
             create_blocked_run(
                 run_directory,
@@ -976,6 +952,7 @@ def run_capture(args: argparse.Namespace) -> Tuple[Path, bool]:
                 started_at,
                 error,
                 args.host,
+                source_control_context,
             )
             raise LoopbackBindError(
                 "The environment blocked the required loopback TCP listener; "
@@ -1018,7 +995,7 @@ def run_capture(args: argparse.Namespace) -> Tuple[Path, bool]:
                 "PYTHONPATH=src python3 "
                 "scripts/capture_ui_execution_evidence.py"
             ),
-            **git_context(),
+            **source_control_context,
         }
         write_json(run_directory / "run_metadata.json", metadata)
         write_json(
@@ -1161,6 +1138,13 @@ def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
     parser.add_argument(
         "--run-id",
         help="explicit run directory name (default: UTC timestamp plus version)",
+    )
+    parser.add_argument(
+        "--source-commit",
+        help=(
+            "source/test Git commit for a detached staging copy; must match "
+            "HEAD when Git metadata is available"
+        ),
     )
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument(
