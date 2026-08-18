@@ -2,10 +2,13 @@
 
 These selected screenshots document the private Jira Cloud implementation of the RxCare portfolio.
 
-- [Project workspace and Board navigation](https://github.com/user-attachments/assets/d0d073de-8526-4389-9d4f-67441810bc9c);
-- [RXQA-5 Gherkin acceptance criteria](https://github.com/user-attachments/assets/31dfdb06-2213-48fe-aaf8-551b20f0746a);
-- [RXQA-6 manual test steps and expected results](https://github.com/user-attachments/assets/6de7de8a-ca11-4b42-8201-11aa6a27cb66);
-- [Candidate-defect portfolio-practice and not-executed status](https://github.com/user-attachments/assets/25886c65-e93e-47ba-b2cd-aa9e141fe703);
-- [Candidate expected and actual-result design](https://github.com/user-attachments/assets/d91bf468-ea6b-4886-b152-426d7cb3e22e).
+- [Project workspace and Board navigation](02-rxqa-project-board-navigation.jpg)
+- [RXQA-5 Gherkin acceptance criteria](03-rxqa-story-acceptance-criteria.jpg)
+- [RXQA-6 manual test steps and expected results](04-rxqa-manual-test-case.jpg)
+- [Candidate-risk portfolio-practice and not-executed status](04-rxqa-candidate-defect-status.jpg)
 
 All records are synthetic. Screenshots exclude email addresses, private URLs, browser tabs, account controls, and unrelated personal information.
+
+These screenshots document the earlier Jira design state. The later v0.2.0
+API result and the blocked live-browser status are documented in the execution
+reports; no screenshot is relabelled as later execution evidence.
