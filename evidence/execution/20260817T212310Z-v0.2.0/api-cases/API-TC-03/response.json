@@ -1,0 +1,12 @@
+{
+  "body": {
+    "app_version": "0.2.0",
+    "audit_event_id": 3,
+    "issues": [],
+    "message": "Prescription accepted",
+    "reason_code": null,
+    "record_id": "SYN-RUN-003",
+    "status": "ACCEPTED"
+  },
+  "http_status": 201
+}
