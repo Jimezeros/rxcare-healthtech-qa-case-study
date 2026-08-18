@@ -16,6 +16,7 @@ from urllib.parse import parse_qs, unquote, urlparse
 from .database import RxCareDatabase
 from .models import PrescriptionInput
 from .service import PrescriptionService
+from .ui import render_index
 from .version import APP_VERSION
 
 
@@ -27,7 +28,7 @@ def make_handler(service: PrescriptionService):
     """Create a request handler bound to one service instance."""
 
     class RxCareRequestHandler(BaseHTTPRequestHandler):
-        server_version = "RxCarePrototype/0.1"
+        server_version = f"RxCarePrototype/{APP_VERSION}"
         protocol_version = "HTTP/1.1"
 
         def log_message(self, format_string: str, *args: object) -> None:
@@ -39,6 +40,22 @@ def make_handler(service: PrescriptionService):
             self.send_response(status)
             self.send_header("Content-Type", "application/json; charset=utf-8")
             self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
+        def _send_html(self, status: int, body: bytes) -> None:
+            self.send_response(status)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.send_header("Content-Length", str(len(body)))
+            self.send_header("Cache-Control", "no-store")
+            self.send_header("X-Content-Type-Options", "nosniff")
+            self.send_header("Referrer-Policy", "no-referrer")
+            self.send_header(
+                "Content-Security-Policy",
+                "default-src 'self'; style-src 'unsafe-inline'; "
+                "script-src 'unsafe-inline'; connect-src 'self'; "
+                "img-src 'self' data:; base-uri 'none'; form-action 'self'",
+            )
             self.end_headers()
             self.wfile.write(body)
 
@@ -55,6 +72,10 @@ def make_handler(service: PrescriptionService):
 
         def do_GET(self) -> None:  # noqa: N802 - HTTP handler naming
             parsed = urlparse(self.path)
+
+            if parsed.path in ("/", "/index.html"):
+                self._send_html(HTTPStatus.OK, render_index(APP_VERSION))
+                return
 
             if parsed.path == "/health":
                 self._send_json(
