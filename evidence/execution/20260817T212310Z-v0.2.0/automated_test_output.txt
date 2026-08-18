@@ -1,0 +1,26 @@
+test_end_to_end_handler_exposes_canonical_and_safe_audit_evidence (tests.test_http_api.RxCareHttpApiTests) ... ok
+test_health_endpoint (tests.test_http_api.RxCareHttpApiTests) ... ok
+test_ui_route_serves_self_contained_validation_workspace (tests.test_http_api.RxCareHttpApiTests) ... ok
+test_valid_submission_can_be_retrieved (tests.test_http_api.RxCareHttpApiTests) ... ok
+test_whitespace_dosage_returns_structured_422 (tests.test_http_api.RxCareHttpApiTests) ... ok
+test_audit_event_has_only_approved_privacy_safe_fields (tests.test_service.PrescriptionServiceTests) ... ok
+test_duplicate_record_id_is_rejected_without_overwrite (tests.test_service.PrescriptionServiceTests) ... ok
+test_empty_dosage_is_rejected_and_audited_once (tests.test_service.PrescriptionServiceTests) ... ok
+test_null_dosage_is_rejected_and_audited_once (tests.test_service.PrescriptionServiceTests) ... ok
+test_quality_checks_are_zero_for_valid_canonical_data (tests.test_service.PrescriptionServiceTests) ... ok
+test_record_id_is_normalized_consistently_before_storage (tests.test_service.PrescriptionServiceTests) ... ok
+test_sqlite_check_rejects_direct_whitespace_variants (tests.test_service.PrescriptionServiceTests) ... ok
+test_valid_dosage_is_preserved_and_accepted_once (tests.test_service.PrescriptionServiceTests) ... ok
+test_whitespace_dosage_is_rejected_and_audited_once (tests.test_service.PrescriptionServiceTests) ... ok
+test_bind_denial_creates_blocked_not_pass_evidence (tests.test_ui_evidence_script.UiEvidenceScriptTests) ... ok
+test_case_catalog_is_exact_and_synthetic (tests.test_ui_evidence_script.UiEvidenceScriptTests) ... ok
+test_none_empty_and_whitespace_are_blank (tests.test_validation.BlankValueTests) ... ok
+test_visible_text_is_not_blank (tests.test_validation.BlankValueTests) ... ok
+test_valid_record_has_no_issues (tests.test_validation.PrescriptionValidationTests) ... ok
+test_whitespace_dosage_has_exact_rxqa_5_issue (tests.test_validation.PrescriptionValidationTests) ... ok
+test_version_file_package_metadata_and_runtime_match (tests.test_version_consistency.VersionConsistencyTests) ... ok
+
+----------------------------------------------------------------------
+Ran 21 tests in 0.071s
+
+OK

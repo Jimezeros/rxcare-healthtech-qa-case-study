@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuite name="rxcare" tests="21" failures="0" errors="0" skipped="0" time="0.071153">
+  <testcase classname="tests.test_http_api.RxCareHttpApiTests" name="test_end_to_end_handler_exposes_canonical_and_safe_audit_evidence" time="0.005229" />
+  <testcase classname="tests.test_http_api.RxCareHttpApiTests" name="test_health_endpoint" time="0.001993" />
+  <testcase classname="tests.test_http_api.RxCareHttpApiTests" name="test_ui_route_serves_self_contained_validation_workspace" time="0.001880" />
+  <testcase classname="tests.test_http_api.RxCareHttpApiTests" name="test_valid_submission_can_be_retrieved" time="0.002305" />
+  <testcase classname="tests.test_http_api.RxCareHttpApiTests" name="test_whitespace_dosage_returns_structured_422" time="0.002947" />
+  <testcase classname="tests.test_service.PrescriptionServiceTests" name="test_audit_event_has_only_approved_privacy_safe_fields" time="0.002433" />
+  <testcase classname="tests.test_service.PrescriptionServiceTests" name="test_duplicate_record_id_is_rejected_without_overwrite" time="0.003052" />
+  <testcase classname="tests.test_service.PrescriptionServiceTests" name="test_empty_dosage_is_rejected_and_audited_once" time="0.002524" />
+  <testcase classname="tests.test_service.PrescriptionServiceTests" name="test_null_dosage_is_rejected_and_audited_once" time="0.002178" />
+  <testcase classname="tests.test_service.PrescriptionServiceTests" name="test_quality_checks_are_zero_for_valid_canonical_data" time="0.002316" />
+  <testcase classname="tests.test_service.PrescriptionServiceTests" name="test_record_id_is_normalized_consistently_before_storage" time="0.002393" />
+  <testcase classname="tests.test_service.PrescriptionServiceTests" name="test_sqlite_check_rejects_direct_whitespace_variants" time="0.002649" />
+  <testcase classname="tests.test_service.PrescriptionServiceTests" name="test_valid_dosage_is_preserved_and_accepted_once" time="0.002389" />
+  <testcase classname="tests.test_service.PrescriptionServiceTests" name="test_whitespace_dosage_is_rejected_and_audited_once" time="0.002285" />
+  <testcase classname="tests.test_ui_evidence_script.UiEvidenceScriptTests" name="test_bind_denial_creates_blocked_not_pass_evidence" time="0.033940" />
+  <testcase classname="tests.test_ui_evidence_script.UiEvidenceScriptTests" name="test_case_catalog_is_exact_and_synthetic" time="0.000037" />
+  <testcase classname="tests.test_validation.BlankValueTests" name="test_none_empty_and_whitespace_are_blank" time="0.000054" />
+  <testcase classname="tests.test_validation.BlankValueTests" name="test_visible_text_is_not_blank" time="0.000016" />
+  <testcase classname="tests.test_validation.PrescriptionValidationTests" name="test_valid_record_has_no_issues" time="0.000027" />
+  <testcase classname="tests.test_validation.PrescriptionValidationTests" name="test_whitespace_dosage_has_exact_rxqa_5_issue" time="0.000023" />
+  <testcase classname="tests.test_version_consistency.VersionConsistencyTests" name="test_version_file_package_metadata_and_runtime_match" time="0.000209" />
+</testsuite>

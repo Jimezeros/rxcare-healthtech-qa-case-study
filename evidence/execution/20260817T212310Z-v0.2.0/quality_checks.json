@@ -1,0 +1,30 @@
+{
+  "audit_summary": [
+    {
+      "event_count": 1,
+      "outcome": "ACCEPTED"
+    },
+    {
+      "event_count": 3,
+      "outcome": "REJECTED"
+    }
+  ],
+  "prescription_checks": [
+    {
+      "check_name": "DUPLICATE_RECORD_ID_GROUPS",
+      "finding_count": 0
+    },
+    {
+      "check_name": "EMPTY_DOSAGE",
+      "finding_count": 0
+    },
+    {
+      "check_name": "NULL_DOSAGE",
+      "finding_count": 0
+    },
+    {
+      "check_name": "WHITESPACE_ONLY_DOSAGE",
+      "finding_count": 0
+    }
+  ]
+}

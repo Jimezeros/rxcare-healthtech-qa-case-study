@@ -1,0 +1,94 @@
+{
+  "algorithm": "SHA-256",
+  "combined_source_tree_sha256": "ab42816b1c14a669586943ff390564d7feda43f964b7e210a89f6224ce5d82bc",
+  "files": [
+    {
+      "path": "VERSION",
+      "sha256": "1f930dd1f133c1f97a94fe3acb8db34372cf4c01ffdb2b3ff4ca72f9494121e9"
+    },
+    {
+      "path": "pyproject.toml",
+      "sha256": "d20582fb4a77a40483c7d2d41deaa23d1a5615d6376661a8ed4be762f83f18b7"
+    },
+    {
+      "path": "scripts/capture_execution_evidence.py",
+      "sha256": "f6ce11f70816e3a1e4b398d175af05817f3f56cf3146cf08e53b3e6700fb6734"
+    },
+    {
+      "path": "scripts/capture_ui_execution_evidence.py",
+      "sha256": "171c747c82193add78de151d8f06e7eb9fe958f0cb7dd5b25275c08d11fd2fb6"
+    },
+    {
+      "path": "scripts/run_tests.py",
+      "sha256": "712bcae09a3ce920979095e59988f308eccff74f742188ff5941d619a22a1e8e"
+    },
+    {
+      "path": "sql/quality_checks.sql",
+      "sha256": "38d72662a8467bfa412974c47ea0c0471eeda878436613373a9b3f1cfa4dda54"
+    },
+    {
+      "path": "sql/schema.sql",
+      "sha256": "ac0415eac7e89a6a4f95d4c8c461934fb6fcf7c67c698fbca42c87a3eea3d25f"
+    },
+    {
+      "path": "src/rxcare/__init__.py",
+      "sha256": "07615486d7dfec21c7ce7af2efce996ab860baa7084795e2596befbf96d821e0"
+    },
+    {
+      "path": "src/rxcare/__main__.py",
+      "sha256": "41a047dde3749c7802d1ec82b1839a311b64efe20d6fe09de49ed0d0377d0c2d"
+    },
+    {
+      "path": "src/rxcare/database.py",
+      "sha256": "a3159245492627309259c7dd044588c1bf448cd4e31eb0040cd80763525eaf58"
+    },
+    {
+      "path": "src/rxcare/http_api.py",
+      "sha256": "08cd54a7d876bf682fbad1f15a11ac1fe9c4b63d952681c463867684b1c14332"
+    },
+    {
+      "path": "src/rxcare/models.py",
+      "sha256": "03a3c0018150dca9bdc32066dcd6c8cbd9b221208c56921caaca68d3c3667aa0"
+    },
+    {
+      "path": "src/rxcare/service.py",
+      "sha256": "4b3090bc9e951113101ebaa4a321040b4c417e9f8a54b8327eebe61b11e4aeee"
+    },
+    {
+      "path": "src/rxcare/ui.py",
+      "sha256": "deb6e3cefd5c930b09d7e9fb167cde44a18e1c0de9df1da1f5c22def63ddf9e4"
+    },
+    {
+      "path": "src/rxcare/validation.py",
+      "sha256": "6bb4e6425e94785b703e41baa78f320b5158f5e4521d6bf5eb0197292d8a4227"
+    },
+    {
+      "path": "src/rxcare/version.py",
+      "sha256": "8f1e72e34e4ae966d64cbb35b0670700d7bd79a373c0590fab3e9f0a3b0c0635"
+    },
+    {
+      "path": "tests/__init__.py",
+      "sha256": "a68e12f1320ac999fb180c00713f3ab544720e6b6466f8273c4f2a5b4a81f95c"
+    },
+    {
+      "path": "tests/test_http_api.py",
+      "sha256": "7a25d2b16613dff115a070c087216e67206a1e09bd0cb325b05ca18782d4a2bc"
+    },
+    {
+      "path": "tests/test_service.py",
+      "sha256": "91cfcbc9fa8cb7751242a64295494631f7ae4f276c6a0d9c275f29ab1ac053c0"
+    },
+    {
+      "path": "tests/test_ui_evidence_script.py",
+      "sha256": "0db3cb4fa8e682a43a5a759961b466b2a496d3bee3c4d5ccbfdd67e320732ba0"
+    },
+    {
+      "path": "tests/test_validation.py",
+      "sha256": "c3f54e5b48b00ff30cffef96a4b70223ba817660916f07444698af1cdcbd8c57"
+    },
+    {
+      "path": "tests/test_version_consistency.py",
+      "sha256": "ed5358ba65cbbb577bfddb20509a31bf950787a15465627357a0aabf75766416"
+    }
+  ]
+}
