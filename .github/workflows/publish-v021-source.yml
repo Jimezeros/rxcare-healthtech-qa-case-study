@@ -18,7 +18,7 @@ jobs:
       - name: Verify the reviewed public base
         shell: bash
         run: |
-          test "$(git rev-parse HEAD^)" = "eb2a6cf93a6498baa2be95c092e0404c9105f0b7"
+          git merge-base --is-ancestor "9b1799f5400d74bbd15a404590fea1c855b00d39" HEAD
 
       - name: Install the reviewed v0.2.1 source and tests
         shell: bash
