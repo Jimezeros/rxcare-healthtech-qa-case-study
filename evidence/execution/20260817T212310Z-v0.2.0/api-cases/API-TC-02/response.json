@@ -1,0 +1,18 @@
+{
+  "body": {
+    "app_version": "0.2.0",
+    "audit_event_id": 2,
+    "issues": [
+      {
+        "code": "DOSAGE_REQUIRED",
+        "field": "dosage_instruction",
+        "message": "Dosage is required"
+      }
+    ],
+    "message": "Dosage is required",
+    "reason_code": "DOSAGE_REQUIRED",
+    "record_id": "SYN-RUN-002",
+    "status": "REJECTED"
+  },
+  "http_status": 422
+}
