@@ -1,0 +1,50 @@
+[
+  {
+    "actual": 200,
+    "assertion": "HTTP status",
+    "expected": 200,
+    "result": "PASS"
+  },
+  {
+    "actual": 1,
+    "assertion": "exactly one rejected event",
+    "expected": 1,
+    "result": "PASS"
+  },
+  {
+    "actual": [
+      "action",
+      "app_version",
+      "attempt_id",
+      "event_id",
+      "outcome",
+      "reason_code",
+      "record_id",
+      "timestamp_utc"
+    ],
+    "assertion": "approved audit fields only",
+    "expected": [
+      "action",
+      "app_version",
+      "attempt_id",
+      "event_id",
+      "outcome",
+      "reason_code",
+      "record_id",
+      "timestamp_utc"
+    ],
+    "result": "PASS"
+  },
+  {
+    "actual": "REJECTED",
+    "assertion": "audit outcome",
+    "expected": "REJECTED",
+    "result": "PASS"
+  },
+  {
+    "actual": "DOSAGE_REQUIRED",
+    "assertion": "audit reason code",
+    "expected": "DOSAGE_REQUIRED",
+    "result": "PASS"
+  }
+]
