@@ -1,8 +1,8 @@
-# RxCare v0.1.0 — Architecture and boundaries
+# RxCare v0.2.0 — Architecture and boundaries
 
 ## Implemented vertical slice
 
-Version `0.1.0` implements one rule from Jira Story `RXQA-5`:
+Version `0.2.0` implements one rule from Jira Story `RXQA-5` and adds a self-contained local browser interface for exercising it:
 
 > A synthetic prescription submission with a missing, empty, or whitespace-only dosage instruction must be rejected and must not enter canonical prescription storage.
 
@@ -10,7 +10,8 @@ The prototype also creates one privacy-safe audit event for every accepted or re
 
 ```mermaid
 flowchart TD
-    R["HTTP/1.1 JSON request"] --> H["Standard-library HTTP adapter"]
+    U["Local browser workspace"] --> R["HTTP/1.1 JSON request"]
+    R --> H["Standard-library HTTP adapter"]
     H --> S["PrescriptionService"]
     S --> V["Pure Python validation"]
     V -->|"Invalid"| AR["REJECTED audit event"]
@@ -29,7 +30,8 @@ flowchart TD
 | `validation.py` | Pure business rule: `None`, empty, or `strip() == ''` dosage is invalid |
 | `service.py` | Atomic validation, persistence, duplicate handling, and audit-event creation |
 | `database.py` | SQLite connections and parameterised repository queries |
-| `http_api.py` | Minimal JSON/HTTP contract and optional local listener |
+| `http_api.py` | Browser route, JSON/HTTP contract, security headers, and optional local listener |
+| `ui.py` | Dependency-free HTML/CSS/JavaScript validation and evidence workspace |
 | `schema.sql` | Canonical and audit tables plus database constraints |
 | `quality_checks.sql` | Read-only SQL checks for missing dosage and duplicate IDs |
 
@@ -72,12 +74,23 @@ They deliberately exclude patient reference, medication name, dosage text, and o
 
 | Method and path | Result |
 |---|---|
+| `GET /` or `/index.html` | Local synthetic-data browser workspace |
 | `GET /health` | Version and local-prototype status |
 | `POST /api/v1/prescriptions` | `201` accepted, `422` validation rejection, or `409` duplicate ID |
 | `GET /api/v1/prescriptions/{record_id}` | Canonical-record verification |
 | `GET /api/v1/audit-events?record_id=...` | Sanitized audit verification |
 | `GET /api/v1/quality-checks` | SQL finding counts and audit totals |
 
+## Browser-interface boundary
+
+The page submits the four synthetic fields to the same HTTP contract, displays the validation response, queries canonical storage, and renders the sanitized audit events. A rejection exposes the exact `Dosage is required` message next to the dosage field. A privacy-minimised browser evidence hook records only the synthetic record ID, dosage length/code points, HTTP status, and validation response; it does not retain patient reference, medication name, or dosage free text.
+
+The UI warns against real data, but that warning is a procedural safeguard rather than a technical data-loss-prevention control. Authentication and role-based access are intentionally outside this increment.
+
+## Execution boundary
+
+The UI route and its integration hooks are covered by automated HTTP-handler tests. The restricted sprint environment denied creation of a `127.0.0.1` TCP listener, so live browser-to-server execution is not marked Passed. The runbook provides the exact normal-workstation procedure for completing that independent check.
+
 ## Explicit non-claims
 
-Version `0.1.0` does not implement or claim a user interface, authentication or RBAC, encryption review, clinical validation, regulatory compliance, AI functionality, production deployment, FastAPI, ORM use, or broad prescription-validation coverage. Those are separate future increments.
+Version `0.2.0` does not implement or claim authentication or RBAC, encryption review, clinical validation, regulatory compliance, AI functionality, production deployment, FastAPI, ORM use, or broad prescription-validation coverage. It is a local educational interface over one executable rule, not a production frontend.

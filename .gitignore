@@ -15,6 +15,7 @@ personal/
 source-material/
 work/
 evidence/raw/
+evidence/execution/**/raw/
 
 # Job-search and identity documents
 CV_*
@@ -41,9 +42,26 @@ evidence/jira/rxqa-story-raw.jpg
 evidence/jira/tc-current.jpg
 evidence/jira/zoom-test.jpg
 
+# Redundant or non-selected Jira captures; publish only the four reviewed crops
+# linked from README.md and evidence/jira/README.md.
+evidence/jira/01-rxqa-story-and-acceptance-criteria.jpg
+evidence/jira/02-rxqa-kanban-board.jpg
+evidence/jira/02-rxqa-kanban-workflow.jpg
+evidence/jira/03-rxqa-kanban-workflow.jpg
+evidence/jira/05-rxqa-candidate-defect.jpg
+evidence/jira/05-rxqa-candidate-defect-results.jpg
+
 # Preliminary local run superseded by the privacy-focused final v0.1.0 run.
 evidence/execution/20260817T175532Z-v0.1.0/
 evidence/execution/20260817T180242Z-v0.1.0/
 evidence/execution/20260817T180647Z-v0.1.0/
 evidence/execution/20260817T181107Z-v0.1.0/
 evidence/execution/20260817T181431Z-v0.1.0/
+
+# Preliminary v0.2.0 run created before package-version reconciliation.
+evidence/execution/20260817T210847Z-v0.2.0/
+evidence/execution/20260817T211016Z-v0.2.0/
+evidence/execution/20260817T212214Z-v0.2.0/
+
+# Blocked/interim v0.2 loopback attempts superseded by the final source-state bundle.
+evidence/execution/20260817T211433Z-ui-loopback-v0.2.0/

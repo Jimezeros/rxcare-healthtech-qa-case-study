@@ -1,139 +1,136 @@
-# RXQA-5 — Manual Test Cases
+# RXQA-5 — Browser UI Test Cases
 
 ## Requirement
 
 Reject prescription records with missing dosage instructions.
 
-All records below are synthetic. Execution status: **NOT EXECUTED**.
+## v0.2.0 local execution profile
+
+These are the browser variants mapped one-to-one to Jira cases RXQA-6 through RXQA-9. They target the local RxCare v0.2.0 prototype, a fresh SQLite database, and synthetic data only. Authentication/RBAC is outside this increment; the page and local audit-evidence panel do not implement authorization.
+
+**Current execution status:** `BLOCKED — NOT EXECUTED`. The restricted sprint environment denied binding a loopback TCP listener. The UI and its integration hooks are implemented and automated-contract tested, but no browser-to-live-server PASS or screenshot is claimed.
 
 ---
 
-## RXQA-6 / TC-01 — Reject an empty dosage instruction
+## RXQA-6 / UI-TC-01 — Reject an empty dosage instruction
 
-**Objective:** Verify that a synthetic e-prescription record is rejected when dosage instruction is empty.
-
-**Preconditions**
-
-1. Tester is authenticated in the QA environment.
-2. Prescription import form is available.
-3. No real patient or pharmacy data is used.
+**Objective:** Verify that a synthetic prescription record is rejected when dosage instruction is empty.
 
 **Synthetic data**
 
-- Record ID: `SYN-RX-001`
-- Medication: `Amoxicillin 500 mg`
+- Record ID: `SYN-UI-TC01-001`
+- Patient reference: `SYN-PAT-TC01-001`
+- Medication: `Synthetic Medicine A`
 - Dosage instruction: empty
-- Other mandatory fields: valid synthetic values
 
 **Steps**
 
-1. Open the prescription import form.
-2. Enter the synthetic record values.
+1. Open the local RxCare v0.2.0 validation workspace.
+2. Enter the synthetic values.
 3. Leave Dosage instruction empty.
-4. Submit the record for validation.
+4. Select `Validate and verify` once.
+5. Inspect the validation, canonical-record, and audit panels.
 
 **Expected result**
 
-1. Submission is rejected.
-2. `Dosage is required` appears next to the dosage field.
-3. The record is not stored as valid.
-4. A privacy-safe audit event is created.
+1. The request reaches the Python validation service and returns HTTP `422`.
+2. Status is `REJECTED`, reason code is `DOSAGE_REQUIRED`, and `Dosage is required` appears next to the dosage field.
+3. Canonical lookup returns `NOT_FOUND`.
+4. Exactly one privacy-safe `REJECTED` audit event exists.
+
+**Observed result:** Not observed; live loopback listener blocked by environment.  
+**Status:** `BLOCKED — NOT EXECUTED`.
 
 ---
 
-## RXQA-7 / TC-02 — Reject whitespace-only dosage
+## RXQA-7 / UI-TC-02 — Reject whitespace-only dosage
 
-**Objective:** Verify that whitespace-only input is normalised as missing and rejected.
-
-**Preconditions**
-
-1. Tester is authenticated in the QA environment.
-2. Prescription import form is available.
-3. No real patient or pharmacy data is used.
+**Objective:** Verify through the browser path that three ASCII spaces cannot bypass validation.
 
 **Synthetic data**
 
-- Record ID: `SYN-RX-002`
-- Medication: `Metformin 850 mg`
-- Dosage instruction: three space characters
+- Record ID: `SYN-UI-TC02-001`
+- Patient reference: `SYN-PAT-TC02-001`
+- Medication: `Synthetic Medicine B`
+- Dosage instruction: exactly three ASCII spaces
 
 **Steps**
 
-1. Enter valid synthetic values in all other mandatory fields.
-2. Enter three spaces in Dosage instruction.
-3. Submit the record.
+1. Enter valid synthetic values in all other fields.
+2. Enter exactly three spaces in Dosage instruction.
+3. Select `Validate and verify` once.
+4. Inspect the validation, canonical-record, audit, and safe browser-evidence values.
 
 **Expected result**
 
-1. Whitespace is trimmed.
-2. Submission is rejected as an empty value.
-3. `Dosage is required` is displayed.
-4. The record is not stored as valid.
+1. Safe browser evidence reports `dosage_length: 3` and code points `[32, 32, 32]` without retaining dosage text.
+2. The service returns HTTP `422`, `REJECTED`, `DOSAGE_REQUIRED`, and exact message `Dosage is required`.
+3. Canonical lookup returns `NOT_FOUND`.
+4. Exactly one privacy-safe `REJECTED` audit event exists.
+
+**Observed result:** Not observed through a live browser. The separate API/handler case passed, but it is not substituted for this UI execution.  
+**Status:** `BLOCKED — NOT EXECUTED`.
 
 ---
 
-## RXQA-8 / TC-03 — Accept a complete dosage instruction
+## RXQA-8 / UI-TC-03 — Accept a complete dosage instruction
 
-**Objective:** Provide a positive control and verify that valid data is not falsely rejected.
-
-**Preconditions**
-
-1. Tester is authenticated in the QA environment.
-2. Prescription import form is available.
-3. No real patient or pharmacy data is used.
+**Objective:** Verify the positive control and ensure valid data is not falsely rejected.
 
 **Synthetic data**
 
-- Record ID: `SYN-RX-003`
-- Medication: `Lisinopril 10 mg`
-- Dosage instruction: `Take one tablet once daily`
+- Record ID: `SYN-UI-TC03-001`
+- Patient reference: `SYN-PAT-TC03-001`
+- Medication: `Synthetic Medicine C`
+- Dosage instruction: `Take one synthetic unit once daily`
 
 **Steps**
 
-1. Open the prescription import form.
-2. Enter the synthetic record values.
-3. Enter the complete dosage instruction.
-4. Submit the record for validation.
-5. Reopen or query the accepted record.
+1. Open the local validation workspace.
+2. Enter the synthetic values and complete dosage instruction.
+3. Select `Validate and verify` once.
+4. Inspect the validation, canonical-record, and audit panels.
 
 **Expected result**
 
-1. No dosage-required message is displayed.
-2. The record is accepted and displayed once.
-3. Stored dosage text matches the submitted value.
-4. A privacy-safe success audit event is created.
+1. The service returns HTTP `201` and status `ACCEPTED` with no dosage error.
+2. Exactly one canonical record is shown.
+3. Stored values, especially dosage, match the submitted values exactly.
+4. Exactly one privacy-safe `ACCEPTED` audit event exists.
+
+**Observed result:** Not observed; live loopback listener blocked by environment.  
+**Status:** `BLOCKED — NOT EXECUTED`.
 
 ---
 
-## RXQA-9 / TC-04 — Create a privacy-safe rejection audit event
+## RXQA-9 / UI-TC-04 — Create a privacy-safe rejection audit event
 
-**Objective:** Verify that rejection creates traceability without exposing unnecessary sensitive information.
-
-**Preconditions**
-
-1. Tester is authenticated in the QA environment.
-2. Prescription import form and authorized audit view are available.
-3. No real patient or pharmacy data is used.
+**Objective:** Verify browser-visible rejection traceability without unnecessary sensitive fields.
 
 **Synthetic data**
 
-- Record ID: `SYN-RX-004`
-- Patient reference: `SYN-PAT-004`
-- Medication: `Ibuprofen 400 mg`
+- Record ID: `SYN-UI-TC04-001`
+- Patient reference: `SYN-PAT-TC04-001`
+- Medication: `Synthetic Medicine D`
 - Dosage instruction: empty
 
 **Steps**
 
-1. Open the prescription import form.
-2. Enter the synthetic record values and leave dosage instruction empty.
-3. Submit the record.
-4. Record the submission timestamp and synthetic record ID.
-5. Open the authorized audit view.
-6. Search for the matching validation attempt.
+1. Open the local validation workspace.
+2. Enter the synthetic values and leave dosage empty.
+3. Select `Validate and verify` once.
+4. Inspect the audit-evidence panel for the matching synthetic record ID.
 
 **Expected result**
 
-1. Exactly one rejection event exists.
-2. It records timestamp, action, synthetic record ID, and outcome `REJECTED`.
-3. It contains no patient name, contact data, or prescription free text.
-4. The rejected record is not represented as valid medication.
+1. Submission returns HTTP `422` and no canonical record exists.
+2. Exactly one event exists with only `event_id`, `attempt_id`, `timestamp_utc`, `action`, `record_id`, `outcome`, `reason_code`, and `app_version`.
+3. The event records `PRESCRIPTION_VALIDATION`, `REJECTED`, and `DOSAGE_REQUIRED`.
+4. The event contains no patient reference, medication name, dosage text, or other free text.
+
+**Observed result:** Not observed; live loopback listener blocked by environment.  
+**Status:** `BLOCKED — NOT EXECUTED`.
+
+## Run-level acceptance check
+
+After genuine execution of all four cases against a fresh database, the expected total is one canonical record and four audit events: three `REJECTED` and one `ACCEPTED`. All canonical SQL quality-check findings must remain zero. Until that run and privacy-safe evidence exist, these cases remain `Not Executed`.

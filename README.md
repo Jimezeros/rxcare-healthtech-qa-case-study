@@ -2,7 +2,7 @@
 
 An independent HealthTech QA and data-validation case study created and maintained by **Dimitrios Mezes**.
 
-RxCare now contains one working, reproducible vertical slice: a local Python service validates the dosage-completeness rule in `RXQA-5`, persists accepted synthetic records in SQLite, creates privacy-safe audit events for service-level prescription validation attempts, exposes a small HTTP contract, and produces structured execution evidence.
+RxCare now contains one working vertical slice with a browser-facing interface: a local Python service validates the dosage-completeness rule in `RXQA-5`, persists accepted synthetic records in SQLite, creates privacy-safe audit events for service-level prescription validation attempts, exposes a small HTTP contract, and serves a self-contained web workspace for validation and verification.
 
 ## Product and scope
 
@@ -10,23 +10,24 @@ RxCare is a fictional medication-management and e-prescription quality applicati
 
 Only synthetic data is used. The repository contains no real patient, prescription, pharmacy, employer, client, or production information.
 
-## Verified status — v0.1.0
+## Verified status — v0.2.0
 
 | Capability | Status | Evidence |
 |---|---|---|
-| Jira story, acceptance criteria, and four UI-oriented manual test designs | Designed — UI tests remain **Not Executed** | [Jira evidence](#jira-evidence), [manual cases](MANUAL_TEST_CASES_RXQA-5.md) |
-| Python dosage-completeness validation | Implemented and executed | [`src/rxcare/validation.py`](src/rxcare/validation.py), [test output](evidence/execution/20260817T185026Z-v0.1.0/automated_test_output.txt) |
-| SQLite canonical storage and privacy-safe audit log | Implemented and executed | [`sql/schema.sql`](sql/schema.sql), [sanitized audit evidence](evidence/execution/20260817T185026Z-v0.1.0/sanitized_audit_events.json) |
-| Parameterised SQL and quality checks | Implemented and executed | [`sql/quality_checks.sql`](sql/quality_checks.sql), [query results](evidence/execution/20260817T185026Z-v0.1.0/quality_checks.json) |
+| Jira story, acceptance criteria, and four UI-oriented manual test designs | Designed; v0.2 local execution profile prepared | [Jira evidence](#jira-evidence), [manual cases](MANUAL_TEST_CASES_RXQA-5.md) |
+| Browser-facing validation workspace | Implemented; HTML/HTTP contract tested | [`src/rxcare/ui.py`](src/rxcare/ui.py), [`tests/test_http_api.py`](tests/test_http_api.py) |
+| Python dosage-completeness validation | Implemented and executed | [`src/rxcare/validation.py`](src/rxcare/validation.py), [test output](evidence/execution/20260817T212310Z-v0.2.0/automated_test_output.txt) |
+| SQLite canonical storage and privacy-safe audit log | Implemented and executed | [`sql/schema.sql`](sql/schema.sql), [sanitized audit evidence](evidence/execution/20260817T212310Z-v0.2.0/sanitized_audit_events.json) |
+| Parameterised SQL and quality checks | Implemented and executed | [`sql/quality_checks.sql`](sql/quality_checks.sql), [query results](evidence/execution/20260817T212310Z-v0.2.0/quality_checks.json) |
 | Local HTTP request/response contract | Implemented; handler contract executed in-process | [`src/rxcare/http_api.py`](src/rxcare/http_api.py), [API cases](API_TEST_CASES_RXQA-5.md) |
-| Automated unit, integration, database, and HTTP-handler tests | **16/16 Passed** | [JUnit XML](evidence/execution/20260817T185026Z-v0.1.0/junit.xml) |
-| Live TCP-port smoke test | **Not Executed** in the restricted sprint environment | [run metadata](evidence/execution/20260817T185026Z-v0.1.0/run_metadata.json), [local runbook](RUNBOOK_GR.md) |
-| RXQA-10 whitespace candidate risk | **Not reproduced on v0.1.0**; not a confirmed defect | [assessment](BUG_REPORT_RXQA-10.md) |
-| UI, authentication/RBAC, FastAPI migration, large synthetic dataset, broader medication rules, and deployment | Planned — not claimed as implemented | [methodology](PROJECT_METHODOLOGY.md) |
+| Automated unit, integration, database, HTTP-handler, UI-contract, evidence-runner, and release-metadata tests | **21/21 Passed** in the final local suite | [test output](evidence/execution/20260817T212310Z-v0.2.0/automated_test_output.txt), [JUnit](evidence/execution/20260817T212310Z-v0.2.0/junit.xml) |
+| Live loopback browser-to-server execution | **Blocked by the restricted sprint environment; not marked Passed** | [blocked-run metadata](evidence/execution/20260817T212440Z-ui-loopback-v0.2.0/run_metadata.json), [local runbook](RUNBOOK_GR.md) |
+| RXQA-10 whitespace candidate risk | **Not reproduced through API/handler on v0.2.0**; UI reproduction remains pending | [assessment](BUG_REPORT_RXQA-10.md) |
+| Authentication/RBAC, FastAPI migration, large synthetic dataset, broader medication rules, domain review, and deployment | Planned — not claimed as implemented | [methodology](PROJECT_METHODOLOGY.md) |
 
-## First execution result
+## Current v0.2.0 API/handler result
 
-The evidence run `20260817T185026Z-v0.1.0` passed:
+The final in-process API evidence run `20260817T212310Z-v0.2.0` passed:
 
 - empty dosage rejected with HTTP 422;
 - whitespace-only dosage rejected with HTTP 422;
@@ -36,7 +37,9 @@ The evidence run `20260817T185026Z-v0.1.0` passed:
 - duplicate record ID rejected with HTTP 409;
 - SQLite independently blocked a direct whitespace-only insert;
 - all four canonical-data SQL quality checks returned zero findings;
-- 16 automated tests passed.
+- 21 automated tests passed in the final local suite, including the UI route, accessible error hook, accepted/rejected verification paths, evidence-runner behaviour, and version consistency.
+
+The listener and browser cases are not included in that PASS: the restricted execution environment returned `EPERM` when asked to bind `127.0.0.1`. The implementation and runbook are ready for the separate workstation run, but no simulated screenshot is presented as execution evidence.
 
 Start with the [execution report](TEST_EXECUTION_REPORT.md) and follow its links to the raw, synthetic evidence package.
 
@@ -44,7 +47,8 @@ Start with the [execution report](TEST_EXECUTION_REPORT.md) and follow its links
 
 ```mermaid
 flowchart LR
-    A["Synthetic HTTP request"] --> B["Python HTTP adapter"]
+    U["Local browser UI"] --> A["Synthetic HTTP request"]
+    A --> B["Python HTTP adapter"]
     B --> C["Pure validation rule"]
     C -->|"Accepted"| D["SQLite prescriptions"]
     C -->|"Accepted or rejected"| E["Privacy-safe audit event"]
@@ -52,7 +56,7 @@ flowchart LR
     E --> F
 ```
 
-The implementation uses Python's standard library only so the first slice can be reproduced without downloading packages. FastAPI is deliberately listed as a later milestone, not as a current capability. See [ARCHITECTURE.md](ARCHITECTURE.md) for the design decisions and boundaries.
+The implementation uses Python's standard library and a self-contained HTML/CSS/JavaScript page, so the slice can be reproduced without downloading packages. FastAPI remains a later milestone. See [ARCHITECTURE.md](ARCHITECTURE.md) for the design decisions and boundaries.
 
 ## Reproduce locally
 
@@ -70,21 +74,21 @@ The screenshots document the private Jira Cloud implementation. Only selected pr
 
 ### Project workspace and Board navigation
 
-![RxCare Jira project with Board navigation selected](https://github.com/user-attachments/assets/d0d073de-8526-4389-9d4f-67441810bc9c)
+![RxCare Jira project with Board navigation selected](evidence/jira/02-rxqa-project-board-navigation.jpg)
 
 ### Story acceptance criteria
 
-![RXQA-5 Given When Then acceptance criteria in Jira](https://github.com/user-attachments/assets/31dfdb06-2213-48fe-aaf8-551b20f0746a)
+![RXQA-5 Given When Then acceptance criteria in Jira](evidence/jira/03-rxqa-story-acceptance-criteria.jpg)
 
 ### Manual test design
 
-![RXQA-6 manual test steps and expected results in Jira](https://github.com/user-attachments/assets/6de7de8a-ca11-4b42-8201-11aa6a27cb66)
+![RXQA-6 manual test steps and expected results in Jira](evidence/jira/04-rxqa-manual-test-case.jpg)
 
 ### Candidate-risk status and traceability
 
-![RXQA-10 clearly labelled as portfolio practice and not executed](https://github.com/user-attachments/assets/25886c65-e93e-47ba-b2cd-aa9e141fe703)
+![RXQA-10 clearly labelled as portfolio practice and not executed](evidence/jira/04-rxqa-candidate-defect-status.jpg)
 
-The screenshot records remain evidence of the earlier design state. The later executable result is documented separately: RXQA-10 was not reproduced on v0.1.0.
+The screenshot records remain evidence of the earlier Jira design state. The later API/handler result is documented separately: RXQA-10 was not reproduced on v0.2.0. Browser execution is still pending and is not inferred from the API result.
 
 ## Repository guide
 
@@ -95,7 +99,7 @@ The screenshot records remain evidence of the earlier design state. The later ex
 | [API_TEST_CASES_RXQA-5.md](API_TEST_CASES_RXQA-5.md) | Executed API-contract cases and evidence links |
 | [TEST_EXECUTION_REPORT.md](TEST_EXECUTION_REPORT.md) | Latest verified execution summary |
 | [TRACEABILITY_MATRIX.md](TRACEABILITY_MATRIX.md) | Requirement-to-design-to-execution coverage |
-| [MANUAL_TEST_CASES_RXQA-5.md](MANUAL_TEST_CASES_RXQA-5.md) | Four UI-oriented test designs, still Not Executed |
+| [MANUAL_TEST_CASES_RXQA-5.md](MANUAL_TEST_CASES_RXQA-5.md) | Four UI-oriented cases and their honest v0.2 execution status |
 | [BUG_REPORT_RXQA-10.md](BUG_REPORT_RXQA-10.md) | Candidate-risk assessment and not-reproduced result |
 | [PROJECT_METHODOLOGY.md](PROJECT_METHODOLOGY.md) | Evidence rules, current scope, and planned coverage |
 | [SYNTHETIC_DATA_POLICY.md](SYNTHETIC_DATA_POLICY.md) | Privacy-safe fictional-data rules |
