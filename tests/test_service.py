@@ -9,6 +9,7 @@ from typing import Optional
 from rxcare.database import RxCareDatabase
 from rxcare.models import PrescriptionInput
 from rxcare.service import PrescriptionService
+from rxcare.version import APP_VERSION
 
 
 class PrescriptionServiceTests(unittest.TestCase):
@@ -168,7 +169,7 @@ class PrescriptionServiceTests(unittest.TestCase):
                                 "Synthetic Medicine",
                                 dosage,
                                 "2026-08-17T00:00:00Z",
-                                "0.1.0",
+                                APP_VERSION,
                             ),
                         )
 
